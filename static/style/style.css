@@ -1,0 +1,33 @@
+form {
+   margin-left: 40px;
+   margin-right: 800px;
+}
+#login_h1 {
+   color: #333333;
+   margin-top: 20px;
+   margin-left: 20px;
+   margin-right: auto;
+   background: url('https://yastatic.net/s3/lyceum/content/images/second-year/web/MARS-2-7.png') no-repeat;
+   padding-left: 155px;
+}
+.post{
+    border: 2px solid black;
+    border-radius: 10px;
+}
+#news{
+    max-width: 60%;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+.private{
+    color: rgb(100, 100, 180);
+    display:inline-block;
+}
+h2, .buttons, table {
+    margin-left: 2%;
+    margin-right: 2%;
+}
+.forms{
+    margin-left: 10%;
+    margin-right: 10%;
+}

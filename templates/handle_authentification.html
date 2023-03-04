@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Записи в блоге</h2>
+<div id="news">
+{% for el in news %}
+    <div class="post">
+        <h3 class="news_title">{{ el.title }}</h3>
+        {% if el.is_private %}
+            <p class="private">   Видите только вы</p>
+        {% endif %}
+        <p>{{ el.content }}
+            <br/>
+        Автор - {{ el.user.name }}, Дата написания - {{ el.created_date }}</p>
+
+    </div>
+<br/>
+{% endfor %}
+</div>
+{% endblock %}
