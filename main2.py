@@ -1,17 +1,15 @@
 from flask import Flask, render_template, redirect, request
 import datetime
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user, UserMixin
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask_wtf import FlaskForm
 from wtforms import PasswordField, BooleanField, SubmitField, EmailField, StringField, IntegerField
 from wtforms import SelectMultipleField, DateTimeField, SelectField
 from wtforms.validators import DataRequired
 from data import db_session
-from data.db_session import SqlAlchemyBase
 from data.users import User
 from data.jobs import Jobs
 from data.news import News
 from data.hazard_levels import HazardLevel
-import sqlalchemy
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -72,9 +70,22 @@ def index():
     if current_user.is_authenticated:
         news = db_sess.query(News).filter(
             (News.user == current_user) | (News.is_private != True))
+        print(current_user)
+        res = dbs.query(Jobs).filter((Jobs.id == id), (Jobs.user == current_user))
+        jobs = []
+        for el in res:
+            title = el.job
+            time = el.end_date - el.start_date
+            team_leader = f"{el.user.name} {el.user.surname}"
+            collaborators = el.collaborators
+            isf = el.is_finished
+            lvl = el.hazard_level[-1].level
+            jobs.append([title, team_leader, time, collaborators, isf, el.user.id, el.id, lvl])
     else:
         news = db_sess.query(News).filter(News.is_private != True)
-    return render_template('handle_authentification.html', news=news)
+        jobs = [""]
+
+    return render_template('handle_authentification.html', news=news, jobs=jobs)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -126,7 +137,7 @@ def register():
     return render_template('register.html', title='Register form', form=form)
 
 
-@app.route('/addjobu', methods=['GET', 'POST'])
+@app.route('/addjob', methods=['GET', 'POST'])
 @login_required
 def addjob():
     form = JobForm()
@@ -154,6 +165,34 @@ def addjob():
     return render_template('addjob.html', form=form)
 
 
+@app.route('/addjob', methods=['GET', 'POST'])
+@login_required
+def addjobu():
+    form = JobForm()
+    dbs = db_session.create_session()
+    res = dbs.query(User).all()
+    for el in res:
+        form.email.choices.append(el.email)
+        form.collaborators.choices.append(str(el.id))
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        job = Jobs()
+        job.job = form.name.data
+        job.team_leader = current_user.id
+        job.collaborators = ','.join(form.collaborators.data)
+        job.is_finished = form.is_finished.data
+        job.start_date = form.start_date.data
+        job.end_date = form.end_date.data
+        job.work_size = form.work_size.data
+        hazard = HazardLevel()
+        hazard.level = form.hazard_level.data
+        job.hazard_level.append(hazard)
+        db_sess.add(job)
+        db_sess.commit()
+        return redirect("/")
+    return render_template('addjobu.html', form=form)
+
+
 @app.route('/alljobs')
 def all_jobs():
     dbs = db_session.create_session()
@@ -162,6 +201,7 @@ def all_jobs():
     for el in res:
         title = el.job
         time = el.end_date - el.start_date
+        print(el, "-", time)
         team_leader = f"{el.user.name} {el.user.surname}"
         collaborators = el.collaborators
         isf = el.is_finished
