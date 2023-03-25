@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Записи в блоге</h2>
-<div id="news">
-{% for el in news %}
-    <div class="post">
-        <h3 class="news_title">{{ el.title }}</h3>
-        {% if el.is_private %}
-            <p class="private">   Видите только вы</p>
-        {% endif %}
-        <p>{{ el.content }}
-            <br/>
-        Автор - {{ el.user.name }}, Дата написания - {{ el.created_date }}</p>
-
+<h2 id="spec2">Works log</h2>
+<div id="work_logs">
+{% if current_user.is_authenticated %}
+    <a href="addjobu" class="btn btn-secondary">Добавить работу</a>
+    <br/>
+{% for job in jobs %}
+    <h5>Задача № #{{ job[6] }}</h5>
+    <div class="buttons">
+        <a href="/addjob/{{ job[6] }}" class="btn btn-danger">Изменить</a>
+        <a href="/job_delete/{{ job[6] }}" class="btn btn-danger">Удалить</a>
     </div>
-<br/>
+    <br/>
+    ./ таблица с НАЗВАНИЯМИ всех комнат + кнопки для них
+    ./ таблица для всех работ + кнопки для них
 {% endfor %}
+
+{% endif %}
 </div>
 {% endblock %}
