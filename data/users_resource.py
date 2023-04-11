@@ -1,6 +1,6 @@
 from flask_restful import reqparse, abort, Api, Resource
 from flask import Flask, request, jsonify
-from users import User
+from .users import User
 from data import db_session
 from werkzeug.security import generate_password_hash
 
@@ -21,6 +21,7 @@ class UsersResource(Resource):
     def get(self, users_id):
         abort_if_users_not_int(users_id)
         users_id = int(users_id)
+        print('qwert')
         abort_if_users_not_found(users_id)
         session = db_session.create_session()
         news = session.query(User).get(users_id)
