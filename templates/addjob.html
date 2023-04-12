@@ -23,6 +23,15 @@
             {% endfor %}
         </div>
         <div class="forms">
+            {{ form.about.label }}<br>
+            {{ form.about(class="form-control") }}<br>
+            {% for error in form.about.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
             {{ form.work_size.label }}<br>
             {{ form.work_size(class="form-control") }}<br>
             {% for error in form.work_size.errors %}

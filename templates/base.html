@@ -15,10 +15,9 @@
         <nav><a>
             {% if current_user.is_authenticated %}
                 <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
-                {% if current_user.is_authenticated %}
                 <div class="alert">
                 <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                This is an alert box.</div>
+                Вы можете редактировать и удалять только те задачи, в которых являетесь Владельцем!</div>
             {% else %}
                 <a>
                     <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
@@ -26,6 +25,7 @@
                 </a>
             {% endif %}
         </a></nav>
-         {% block content %}{% endblock content %}
+         {% block content %}
+         {% endblock content %}
     </body>
 </html>

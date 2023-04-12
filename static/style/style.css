@@ -54,3 +54,43 @@ h2, .buttons, table {
 .closebtn:hover {
   color: black;
 }
+#work_logs {
+  padding-left: 300px;
+}
+/* alljobs */
+#parent1 {
+    display: flex;
+}
+#room_list {
+    max-width: 200px;
+    margin-left: 5%;
+    margin-right: 3%;
+}
+#main_table {
+    border-collapse: separate;
+	border-spacing: 20px;
+    margin-left: 3%;
+    margin-right: 3%;
+    max-width: 70%;
+}
+#job_name {
+	text-align: center;
+	font-weight: bold;
+	width: 250px;
+	word-wrap: break-word;
+}
+#job_cover {
+	text-align: center;
+	width: 250px;
+	word-wrap: break-word;
+}
+#job_img {
+	height: 200px;
+	width: 200px;
+}
+#job_teamlead{
+	text-align: center;
+	font-weight: bold;
+	width: 250px;
+	word-wrap: break-word;
+}

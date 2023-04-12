@@ -18,3 +18,4 @@ class Jobs(SqlAlchemyBase):
     #user_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship("User")
     hazard_level = orm.relationship("HazardLevel", secondary="association",  backref="jobs")
+    description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
