@@ -21,13 +21,9 @@ login_manager.init_app(app)
 
 db_session.global_init("db/blogs.db")
 dbs = db_session.create_session()
-room = Rooms()
-room.title = "Test1"
-room.about = "Test subject"
-room.team_leader = dbs.query(User).filter(User.id == 1).first().id
-room.tasks = ', '.join(map(lambda x: str(x.id), dbs.query(Jobs).filter((Jobs.id == 1) | (Jobs.id == 2)).all()))
-room.collaborators = "0"
-# dbs.add(room)
+# for el in dbs.query(User).all():
+#    if 6 <= el.id <= 12:
+#        dbs.delete(el)
 dbs.commit()
 
 
@@ -84,25 +80,7 @@ def load_user(user_id):
 @app.route("/")
 @app.route("/index")
 def index():
-    db_sess = db_session.create_session()
-    if current_user.is_authenticated:
-        news = db_sess.query(News).filter(
-            (News.user == current_user) | (News.is_private != True))
-        dbs = db_session.create_session()
-        res = dbs.query(Jobs).all()
-        jobs = []
-        for el in res:
-            title = el.job
-            time = el.end_date - el.start_date
-            team_leader = f"{el.user.name} {el.user.surname}"
-            collaborators = el.collaborators
-            isf = el.is_finished
-            lvl = el.hazard_level[-1].level
-            jobs.append([title, team_leader, time, collaborators, isf, el.user.id, el.id, lvl])
-        return render_template('alljobs.html', jobs=jobs)
-    else:
-        news = db_sess.query(News).filter(News.is_private != True)
-    return render_template('handle_authentification.html', news=news)
+    return render_template("handle_authentification.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -149,15 +127,20 @@ def register():
             speciality=form.speciality.data)
         user.set_password(form.password.data)
         db_sess.add(user)
+
+        db_sess.commit()
         personal_room = Rooms()
         personal_room.title = "Test1"
         personal_room.about = "Test subject"
-        personal_room.team_leader = user.id
+        tl = db_sess.query(User).filter(User.email == form.email.data).first()
+        personal_room.team_leader = tl.id
         db_sess.add(personal_room)
-        user.current_room = personal_room.id
+        db_sess.commit()
+        tl.current_room = db_sess.query(Rooms).filter(
+            db_sess.query(User).filter(User.email == form.email.data).first().id == Rooms.team_leader).first().id
         db_sess.add(user)
         db_sess.commit()
-        return redirect(f'/alljobs/{personal_room.id}')
+        return redirect(f'/login')
     return render_template('register.html', title='Register form', form=form)
 
 
@@ -168,7 +151,10 @@ def all_jobs(id):
     data = []
     ct = 0
     current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
-    x = current_room.tasks.split(", ")
+    if current_room.tasks is not None:
+        x = current_room.tasks.split(", ")
+    else:
+        x = None
     if x and not (len(x) == 1 and not x[0]):
         available_tasks = tuple(map(int, x))
     else:
