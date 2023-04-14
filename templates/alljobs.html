@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 id="spec2">Комната номер {{ crId }} для пользователя {{ crU }}</h2><br>
+<div id="parent1">
+<div id="room_list">
+    {% if current_user.is_authenticated %}
+    <br><a href="/addjob/{{ crId }}" class="btn btn-secondary">Добавить работу</a><br>
+    {% endif %}
+    <br><a href="/allrooms" class="btn btn-secondary">Посмотреть все комнаты</a><br>
+    <br><h4>Комнаты:</h4>
+{% for room in rooms %}
+        <a href="/alljobs/{{ room[1] }}">
+            <li>{{ room[0] }}</li>
+        </a>
+{% endfor %}
+</div>
+<div id="work_logs">
+{% for data in ans %}
+    <table id="main_table">
+        <tr id="job_name">
+            {% for row in data %}
+            <td>
+                <h5>Задача №{{ row[2] }}</h5>
+                <div class="buttons">
+                    <a href="/addjob/{{ row[2] }}" class="btn btn-danger">Изменить</a>
+                    <a href="/job_delete/{{ row[2] }}" class="btn btn-danger">Удалить</a>
+                </div>
+            </td>
+            {% endfor %}
+        </tr>
+        <tr id="job_cover" style="background-color: #e1e1e1">
+            {% for row in data %}
+            <td>
+                <a href="/job_description/{{row[2]}}">
+                    <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img"/>
+                    <div class="CoverText">{{ row[0] }}</div>
+                </a>
+            </td>
+            {% endfor %}
+        </tr>
+        <tr id="job_teamlead" style="background-color: #e1e1e1">
+            {% for row in data %}
+            <td>
+                Тим лид: {{row[1]}}
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

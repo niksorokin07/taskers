@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="work_logs">
+{% if current_user.is_authenticated %}
+    <a href="addjobu" class="btn btn-secondary">Добавить работу</a>
+    <br/>
+{% for job in jobs %}
+    <h5>Задача № #{{ job[6] }}</h5>
+    <div class="buttons">
+        <a href="/addjob/{{ job[6] }}" class="btn btn-danger">Изменить</a>
+        <a href="/job_delete/{{ job[6] }}" class="btn btn-danger">Удалить</a>
+    </div>
+    <br/>
+    ./ таблица с НАЗВАНИЯМИ всех комнат + кнопки для них
+    ./ таблица для всех работ + кнопки для них
+{% endfor %}
+
+{% endif %}
+</div>
+{% endblock %}

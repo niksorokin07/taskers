@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h5>Задача № #{{ job[6] }}</h5>
+<h4>Описание: {{ job[8] }} </h4>
+    <div class="buttons">
+        <a href="/addjob/{{ job[6] }}" class="btn btn-warning">Изменить</a>
+        <a href="/job_delete/{{ job[6] }}" class="btn btn-warning">Удалить</a>
+    </div>
+    <br/>
+    <table class="table">
+      <thead class="thead-light">
+        <tr class="d-flex" style="background-color: #e1e1e1">
+          <th scope="col" class="col-3">Название</th>
+          <th scope="col" class="col-2">Тим Лид</th>
+          <th scope="col" class="col-3">Продолжительность</th>
+          <th scope="col" class="col-2">Дедлайн</th>
+          <th scope="col" class="col-2">Список соучастников</th>
+          <th scope="col" class="col-2" style="background-color: #e1e1e1">Уровень опасности</th>
+          <th scope="col" class="col-2" style="background-color: #e1e1e1">Закончена ли?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="d-flex" style="background-color: #8affff">
+          <td class="col-3">{{ job[0] }}</td>
+          <td class="col-2">{{ job[1] }}</td>
+          <td class="col-3">{{ job[2] }}</td>
+          <td class="col-2">{{ job[9] }}</td>
+          <td class="col-2">{{ job[3] }}</td>
+          <td class="col-2" style="background-color: #8affff">{{ job[7] }}</td>
+          <td class="col-2" style="background-color: #40e0d0">{{ "Работа окончена" if job[4] else "Работа не окончена" }}</td>
+        </tr>
+      </tbody>
+    </table>
+{% endblock %}
