@@ -151,6 +151,7 @@ def all_jobs(id):
     data = []
     ct = 0
     current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
+    current_user.current_room = current_room
     if current_room.tasks is not None:
         x = current_room.tasks.split(", ")
     else:
@@ -184,6 +185,7 @@ def all_jobs(id):
     for el in db_sess.query(Rooms).filter(
             (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%'))).all():
         rooms.append((f"{el.title} |{el.team_leader}", el.id))
+    db_sess.commit()
     return render_template('alljobs.html', ans=ans, rooms=rooms, crId=current_room.id, crU=current_user.email)
 
 
@@ -228,6 +230,8 @@ def addjob(id):
         job.hazard_level.append(hazard)
         db_sess.add(job)
         current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
+        if current_room is None:
+            current_room = []
         available_tasks = list(map(int, current_room.tasks.split(", ")))
         if available_tasks is not None:
             available_tasks.append(job.id)
@@ -286,7 +290,7 @@ def edit_job(id):
             hl.level = form.hazard_level.data
             job.hazard_level.append(hl)
             dbs.commit()
-            return redirect('/alljobs')
+            return redirect(f'/alljobs/{current_user.current_room}')
         else:
             pass
     return render_template('addjob.html', form=form)
@@ -302,7 +306,7 @@ def delete_job(id):
         dbs.commit()
     else:
         pass
-    return redirect('/alljobs')
+    return redirect(f'/alljobs/{current_user.current_room}')
 
 
 @app.route('/allrooms')
