@@ -1,10 +1,8 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+Имя - {{ name }}
 
-{% block content %}
-<h2>Почта: {{ email }}</h2>
-<h2>Фамилия: {{ surname }}</h2>
-<h2>Имя: {{ name }}</h2>
-<h2>Возраст: {{ age }}</h2>
-<h2>Должность: {{ position }}</h2>
-<h2>Профессия: {{ speciality }}</h2>
+Фамилия - {{ surname }}
+
+Почта - {{ email }}
+
 {% endblock %}
