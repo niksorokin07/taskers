@@ -1,13 +1,45 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    #job_teamlead{
+    border: 1px;
+
+    background-color: #AFEEEE;
+    border:
+
+
+    }
+    #roomss{
+
+    text-decoration: none;
+  display: inline-block;
+  color: black;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background-color: #AFEEEE;
+  background-size: 200% auto;
+  transition: .3s;
+    }
+     #roomss:hover{
+     letter-spacing: 3px;
+
+
+
+
+
+
+     }
+</style>
 <h2 id="spec2">Комната номер {{ crId }} для пользователя {{ crU }}</h2>
 <div id="parent1">
 <div id="room_list">
 {% for room in rooms %}
     <ol>
         <a href="/alljobs/{{ room[1] }}">
-            <li>{{ room[0] }}</li>
+            <li id = 'roomss'>{{ room[0] }}</li>
         </a>
     </ol>
 {% endfor %}
@@ -25,23 +57,23 @@
             <td>
                 <h5>Задача №{{ row[2] }}</h5>
                 <div class="buttons">
-                    <a href="/addjob/{{ row[2] }}" class="btn btn-danger">Изменить</a>
-                    <a href="/job_delete/{{ row[2] }}" class="btn btn-danger">Удалить</a>
+                    <a href="/addjob/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Изменить</a>
+                    <a href="/job_delete/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Удалить</a>
                 </div>
             </td>
             {% endfor %}
         </tr>
-        <tr id="job_cover" style="background-color: #e1e1e1">
+        <tr id="job_cover" style="border-radius: 20px;">
             {% for row in data %}
             <td>
                 <a href="/job_description/{{row[2]}}">
-                    <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img"/>
+                    <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img" style="border-radius: 20px;"/>
                     <div class="CoverText">{{ row[0] }}</div>
                 </a>
             </td>
             {% endfor %}
         </tr>
-        <tr id="job_teamlead" style="background-color: #e1e1e1">
+        <tr id="job_teamlead" >
             {% for row in data %}
             <td>
                 Тим лид: {{row[1]}}
@@ -53,3 +85,6 @@
 </div>
 </div>
 {% endblock %}
+
+
+

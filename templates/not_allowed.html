@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="work_logs">
+    <h1>Упс! Кажется, вам сюда нельзя. У вас недостаточно прав. </h1>
+    <a href="/alljobs/{{ room[1] }}">
+        <a href="/allrooms" class="btn btn-success">Вернуться и осмотреть все комнаты</a>
+    </a>
+</div>
+{% endblock %}
