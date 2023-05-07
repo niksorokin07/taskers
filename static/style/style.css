@@ -1,6 +1,17 @@
 form {
-   margin-left: 40px;
-   margin-right: 800px;
+   display: block;
+   margin-left: 300px;
+   margin-right: 300px;
+   border: 2px solid black;
+   border-radius: 10px;
+   background: #AFEEEE;
+   padding-left: 50px;
+   padding-right: 50px;
+   padding-top: 20px;
+   padding-bottom: 20px;
+}
+img {
+    margin-left: 10px;
 }
 #login_h1 {
    color: #333333;
@@ -14,6 +25,11 @@ form {
     border: 2px solid black;
     border-radius: 10px;
 }
+b {
+    margin-left: 230px;
+    margin-right: auto;
+}
+
 #news{
     max-width: 60%;
     margin-left: 2%;
@@ -23,13 +39,22 @@ form {
     color: rgb(100, 100, 180);
     display:inline-block;
 }
-h2, .buttons, table {
-    margin-left: 2%;
-    margin-right: 2%;
+h2, div, .buttons, table {
+    font-family: cursive;
+    display: block;
+}
+h2 {
+    margin-left: 150px;
+}
+
+h3 {
+    margin-left: 300px;
+}
+h4 {
+    margin-left: 15px;
 }
 .forms{
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 10px;
 }
 .alert {
   padding: 20px;
@@ -54,6 +79,7 @@ h2, .buttons, table {
 .closebtn:hover {
   color: black;
 }
+
 #work_logs {
   padding-left: 300px;
 }
@@ -94,3 +120,5 @@ h2, .buttons, table {
 	width: 250px;
 	word-wrap: break-word;
 }
+
+
