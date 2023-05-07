@@ -1,2 +1,5 @@
-# taskers
-Our project
+# Taskers.
+A WEB project by 9-9 Student's
+
+# Инструкция пользования
+Основная ветка - Release-1, для проверки можете скачать её, как архив. Наш сайт также размещён на Glitch: 
