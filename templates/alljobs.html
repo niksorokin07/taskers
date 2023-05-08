@@ -109,7 +109,7 @@
         <tr id="job_cover" style="border-radius: 20px;">
             {% for row in data %}
             <td>
-                <a href="/job_description/{{row[2]}}">
+                <a href="/job_description/{{row[2]}}/{{crId}}">
                     <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img" style="border-radius: 20px;"/>
                     <div class="CoverText">{{ row[0] }}</div>
                 </a>

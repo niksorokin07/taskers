@@ -24,9 +24,9 @@ login_manager.init_app(app)
 
 db_session.global_init("db/blogs.db")
 dbs = db_session.create_session()
-# for el in dbs.query(User).all():
-#    if 6 <= el.id <= 12:
-#        dbs.delete(el)
+# for el in dbs.query(Jobs).all():
+#    if 2 <= el.id <= 3:
+#       dbs.delete(el)
 dbs.commit()
 job_status_transcriber = ["Начат", "Окончен", "Выполняется", "Отменён", "Выполнен", "Не выполнен", "Приостановлен"]
 
@@ -172,86 +172,166 @@ def all_jobs(id):
     data = []
     ct = 0
     current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
-    if current_user.id in [current_room.team_leader] + current_room.collaborators.split(","):
-        if current_room.tasks is not None:
-            x = current_room.tasks.split(", ")
+    if current_room is not None:
+        if current_room.collaborators:
+            if current_user.id in [current_room.team_leader] + current_room.collaborators.split(","):
+                if current_room.tasks is not None:
+                    x = current_room.tasks.split(", ")
+                else:
+                    x = None
+                if x and not (len(x) == 1 and not x[0]):
+                    available_tasks = tuple(map(int, x))
+                else:
+                    available_tasks = ()
+                for el in db_sess.query(Jobs):
+                    if el.id in available_tasks:
+                        team_leader = f"{el.user.name} {el.user.surname}"
+                        cover = str(random.randint(1, 21)) + ".png"
+                        data.append((el.job, team_leader, el.id, cover))
+                ans = []
+                i = 0
+                while i < len(data):
+                    curr = []
+                    for j in range(4):
+                        if i >= len(data):
+                            break
+                        curr.append(data[i])
+                        i += 1
+                    ans.append(curr)
+                rooms = []
+                for el in db_sess.query(Rooms).filter(
+                        (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(
+                            f'%{current_user.id}%'))).all():
+                    rooms.append((f"{el.title} |{el.team_leader}", el.id))
+                return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
+                                       crId=current_room.id, crU=current_user.email)
+            else:
+                return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
         else:
-            x = None
-        if x and not (len(x) == 1 and not x[0]):
-            available_tasks = tuple(map(int, x))
-        else:
-            available_tasks = ()
-        for el in db_sess.query(Jobs):
-            if el.id in available_tasks:
-                team_leader = f"{el.user.name} {el.user.surname}"
-                cover = str(random.randint(1, 21)) + ".png"
-                data.append((el.job, team_leader, el.id, cover))
-        ans = []
-        i = 0
-        while i < len(data):
-            curr = []
-            for j in range(4):
-                if i >= len(data):
-                    break
-                curr.append(data[i])
-                i += 1
-            ans.append(curr)
-        rooms = []
-        for el in db_sess.query(Rooms).filter(
-                (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%'))).all():
-            rooms.append((f"{el.title} |{el.team_leader}", el.id))
-        return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
-                               crId=current_room.id, crU=current_user.email)
+            if current_user.id in [current_room.team_leader]:
+                if current_room.tasks is not None:
+                    x = current_room.tasks.split(", ")
+                else:
+                    x = None
+                if x and not (len(x) == 1 and not x[0]):
+                    available_tasks = tuple(map(int, x))
+                else:
+                    available_tasks = ()
+                for el in db_sess.query(Jobs):
+                    if el.id in available_tasks:
+                        team_leader = f"{el.user.name} {el.user.surname}"
+                        cover = str(random.randint(1, 21)) + ".png"
+                        data.append((el.job, team_leader, el.id, cover))
+                ans = []
+                i = 0
+                while i < len(data):
+                    curr = []
+                    for j in range(4):
+                        if i >= len(data):
+                            break
+                        curr.append(data[i])
+                        i += 1
+                    ans.append(curr)
+                rooms = []
+                for el in db_sess.query(Rooms).filter(
+                        (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(
+                            f'%{current_user.id}%'))).all():
+                    rooms.append((f"{el.title} |{el.team_leader}", el.id))
+                return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
+                                       crId=current_room.id, crU=current_user.email)
+            else:
+                return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
     else:
-        return render_template('not_allowed.html', room_id=id, f_pr=True)
+        return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
 
 
 @app.route('/search/<int:id>', methods=['POST'])
 def search(id):
     dbs = db_session.create_session()
     current_room = dbs.query(Rooms).filter(Rooms.id == id).first()
-    if current_user.id in [current_room.team_leader] + current_room.collaborators.split(","):
-        query = request.form['query']
-        jobs = []
-        if current_room.tasks is not None:
-            x = current_room.tasks.split(", ")
+    if current_room is not None:
+        if current_room.collaborators:
+            if current_user.id in [current_room.team_leader] + current_room.collaborators.split(","):
+                query = request.form['query']
+                jobs = []
+                if current_room.tasks is not None:
+                    x = current_room.tasks.split(", ")
+                else:
+                    x = None
+                if x and not (len(x) == 1 and not x[0]):
+                    available_tasks = tuple(map(int, x))
+                else:
+                    available_tasks = ()
+                for el in search_results(query.lower()):
+                    if el[0] in available_tasks:
+                        user = dbs.query(User).filter(User.id == el[1]).first()
+                        team_leader = f"{user.name} {user.surname}"
+                        cover = str(random.randint(1, 21)) + ".png"
+                        jobs.append((el[2], team_leader, el[0], cover))
+                ans = []
+                i = 0
+                while i < len(jobs):
+                    curr = []
+                    for j in range(4):
+                        if i >= len(jobs):
+                            break
+                        curr.append(jobs[i])
+                        i += 1
+                    ans.append(curr)
+                rooms = []
+                for el in dbs.query(Rooms).filter(
+                        (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%'))).all():
+                    rooms.append((f"{el.title} |{el.team_leader}", el.id))
+                return render_template('alljobs.html', label=query, ans=ans, rooms=rooms, crId=current_room.id,
+                                       crU=current_user.email)
+            else:
+                return render_template('not_allowed.html', room_id=id, f_pr=True)
         else:
-            x = None
-        if x and not (len(x) == 1 and not x[0]):
-            available_tasks = tuple(map(int, x))
-        else:
-            available_tasks = ()
-        for el in search_results(query.lower()):
-            if el[0] in available_tasks:
-                user = dbs.query(User).filter(User.id == el[1]).first()
-                team_leader = f"{user.name} {user.surname}"
-                cover = str(random.randint(1, 21)) + ".png"
-                jobs.append((el[2], team_leader, el[0], cover))
-        ans = []
-        i = 0
-        while i < len(jobs):
-            curr = []
-            for j in range(4):
-                if i >= len(jobs):
-                    break
-                curr.append(jobs[i])
-                i += 1
-            ans.append(curr)
-        rooms = []
-        for el in dbs.query(Rooms).filter(
-                (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%'))).all():
-            rooms.append((f"{el.title} |{el.team_leader}", el.id))
-        return render_template('alljobs.html', label=query, ans=ans, rooms=rooms, crId=current_room.id,
-                               crU=current_user.email)
+            if current_user.id in [current_room.team_leader]:
+                query = request.form['query']
+                jobs = []
+                if current_room.tasks is not None:
+                    x = current_room.tasks.split(", ")
+                else:
+                    x = None
+                if x and not (len(x) == 1 and not x[0]):
+                    available_tasks = tuple(map(int, x))
+                else:
+                    available_tasks = ()
+                for el in search_results(query.lower()):
+                    if el[0] in available_tasks:
+                        user = dbs.query(User).filter(User.id == el[1]).first()
+                        team_leader = f"{user.name} {user.surname}"
+                        cover = str(random.randint(1, 21)) + ".png"
+                        jobs.append((el[2], team_leader, el[0], cover))
+                ans = []
+                i = 0
+                while i < len(jobs):
+                    curr = []
+                    for j in range(4):
+                        if i >= len(jobs):
+                            break
+                        curr.append(jobs[i])
+                        i += 1
+                    ans.append(curr)
+                rooms = []
+                for el in dbs.query(Rooms).filter(
+                        (Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%'))).all():
+                    rooms.append((f"{el.title} |{el.team_leader}", el.id))
+                return render_template('alljobs.html', label=query, ans=ans, rooms=rooms, crId=current_room.id,
+                                       crU=current_user.email)
+            else:
+                return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
     else:
-        return render_template('not_allowed.html', room_id=id, f_pr=True)
+        return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
 
 
-@app.route('/job_description/<int:id>')
+@app.route('/job_description/<int:id>/<int:room_id>')
 @login_required
-def job_descr(id):
+def job_descr(id, room_id):
     dbs = db_session.create_session()
     task = dbs.query(Jobs).filter(Jobs.id == id).first()
+    current_room = dbs.query(Rooms).filter(Rooms.id == room_id).first()
     if current_user.id in [task.team_leader] + task.collaborators.split(","):
         el = dbs.query(Jobs).filter(Jobs.id == id).first()
         title = el.job
@@ -261,9 +341,9 @@ def job_descr(id):
         isf = job_status_transcriber[int(el.is_finished)]
         lvl = el.intensity_level[-1].level
         job = [title, team_leader, time, collaborators, isf, el.user.id, el.id, lvl, el.description, el.end_date]
-        return render_template("job_description.html", job=job)
+        return render_template("job_description.html", crId=current_room.id, job=job)
     else:
-        return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=False)
+        return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
 
 
 @app.route('/addjob/<int:id>', methods=['GET', 'POST'])
@@ -272,43 +352,86 @@ def addjob(id):
     form = JobForm()
     dbs = db_session.create_session()
     room = dbs.query(Rooms).filter(Rooms.id == id).first()
-    if current_user.id in [room.team_leader] + room.collaborators.split(","):
-        res = dbs.query(User).all()
-        dbs.commit()
-        form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
-        for el in res:
-            form.collaborators.choices.append(str(el.email))
-        for i in range(11):
-            form.intensity_level.choices.append(i)
-        if form.validate_on_submit():
-            db_sess = db_session.create_session()
-            job = Jobs()
-            job.job = form.name.data
-            job.description = form.about.data
-            job.team_leader = current_user.id
-            job.collaborators = ','.join(form.collaborators.data)
-            job.is_finished = job_status_transcriber.index(form.is_finished.data)
-            job.start_date = form.start_date.data
-            job.end_date = form.end_date.data
-            job.work_size = form.work_size.data
-            intensity_level = IntensityLevel()
-            intensity_level.level = form.intensity_level.data
-            job.intensity_level = []
-            job.intensity_level.append(intensity_level)
-            db_sess.add(job)
-            current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
-            available_tasks = list(map(int, current_room.tasks.split(", ")))
-            if available_tasks is not None:
-                available_tasks.append(job.id)
-                current_room.tasks = ', '.join(map(lambda x: str(x), available_tasks))
-            else:
-                current_room.tasks = str(job.id) + ', '
-            db_sess.add(current_room)
-            db_sess.commit()
-            return redirect(f"/alljobs/{id}")
-        return render_template('addjob.html', form=form)
+    if room.collaborators:
+        if current_user.id in [room.team_leader] + room.collaborators.split(","):
+            res = dbs.query(User).all()
+            dbs.commit()
+            form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
+            for el in res:
+                form.collaborators.choices.append(str(el.email))
+            for i in range(11):
+                form.intensity_level.choices.append(i)
+            if form.validate_on_submit():
+                db_sess = db_session.create_session()
+                job = Jobs()
+                job.job = form.name.data
+                job.description = form.about.data
+                job.team_leader = current_user.id
+                job.collaborators = ','.join(form.collaborators.data)
+                job.is_finished = job_status_transcriber.index(form.is_finished.data)
+                job.start_date = form.start_date.data
+                job.end_date = form.end_date.data
+                job.work_size = form.work_size.data
+                intensity_level = IntensityLevel()
+                intensity_level.level = form.intensity_level.data
+                job.intensity_level = []
+                job.intensity_level.append(intensity_level)
+                db_sess.add(job)
+                current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
+                available_tasks = list(map(int, current_room.tasks.split(", ")))
+                if available_tasks is not None:
+                    available_tasks.append(job.id)
+                    current_room.tasks = ', '.join(map(lambda x: str(x), available_tasks))
+                else:
+                    current_room.tasks = str(job.id) + ', '
+
+                db_sess.add(current_room)
+                db_sess.commit()
+                return redirect(f"/alljobs/{id}")
+            return render_template('addjob.html', form=form)
+        else:
+            return render_template('not_allowed.html', room_id=id, f_pr=False)
     else:
-        return render_template('not_allowed.html', room_id=id, f_pr=False)
+        if current_user.id in [room.team_leader]:
+            res = dbs.query(User).all()
+            dbs.commit()
+            form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
+            for el in res:
+                form.collaborators.choices.append(str(el.email))
+            for i in range(11):
+                form.intensity_level.choices.append(i)
+            if form.validate_on_submit():
+                db_sess = db_session.create_session()
+                job = Jobs()
+                job.job = form.name.data
+                job.description = form.about.data
+                job.team_leader = current_user.id
+                job.collaborators = ','.join(form.collaborators.data)
+                job.is_finished = job_status_transcriber.index(form.is_finished.data)
+                job.start_date = form.start_date.data
+                job.end_date = form.end_date.data
+                job.work_size = form.work_size.data
+                intensity_level = IntensityLevel()
+                intensity_level.level = form.intensity_level.data
+                job.intensity_level = []
+                job.intensity_level.append(intensity_level)
+                db_sess.add(job)
+                current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
+                if not current_room.tasks:
+                    available_tasks = []
+                else:
+                    available_tasks = list(map(int, current_room.tasks.split(", ")))
+                if available_tasks is not None:
+                    available_tasks.append(job.id)
+                    current_room.tasks = ', '.join(map(lambda x: str(x), available_tasks))
+                else:
+                    current_room.tasks = str(job.id) + ', '
+                db_sess.add(current_room)
+                db_sess.commit()
+                return redirect(f"/alljobs/{id}")
+            return render_template('addjob.html', form=form)
+        else:
+            return render_template('not_allowed.html', room_id=id, f_pr=False)
 
 
 @app.route('/addjob/<int:room_id>/<int:job_id>', methods=['GET', 'POST'])
@@ -318,54 +441,57 @@ def edit_job(room_id, job_id):
     dbs = db_session.create_session()
     task = dbs.query(Jobs).filter(Jobs.id == job_id).first()
     if current_user.id in [task.team_leader] + task.collaborators.split(","):
-        res = dbs.query(User).all()
-        form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
-        for el in res:
-            form.collaborators.choices.append(str(el.email))
-        for i in range(11):
-            form.intensity_level.choices.append(i)
-        if request.method == "GET":
-            dbs = db_session.create_session()
-            job = dbs.query(Jobs).filter((Jobs.id == job_id), (Jobs.user == current_user)).first()
-            if job:
-                form.name.data = job.job
-                form.work_size.data = job.work_size
-                form.about.data = job.description
-                form.collaborators.data = job.collaborators
-                form.start_date.data = job.start_date
-                form.end_date.data = job.end_date
-                form.email.data = job.user.email
-                form.is_finished.data = job_status_transcriber[int(job.is_finished)]
-                if job.intensity_level:
-                    form.intensity_level.data = job.intensity_level[-1].level
+        if current_user.id == task.team_leader:
+            res = dbs.query(User).all()
+            form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
+            for el in res:
+                form.collaborators.choices.append(str(el.email))
+            for i in range(11):
+                form.intensity_level.choices.append(i)
+            if request.method == "GET":
+                dbs = db_session.create_session()
+                job = dbs.query(Jobs).filter((Jobs.id == job_id), (Jobs.user == current_user)).first()
+                print(1)
+                if job:
+                    form.name.data = job.job
+                    form.work_size.data = job.work_size
+                    form.about.data = job.description
+                    form.collaborators.data = job.collaborators
+                    form.start_date.data = job.start_date
+                    form.end_date.data = job.end_date
+                    form.email.data = job.user.email
+                    form.is_finished.data = job_status_transcriber[int(job.is_finished)]
+                    if job.intensity_level:
+                        form.intensity_level.data = job.intensity_level[-1].level
+                    else:
+                        form.intensity_level.data = 0
                 else:
-                    form.intensity_level.data = 0
-            else:
-                pass
-        if form.validate_on_submit():
-            dbs = db_session.create_session()
-            job = dbs.query(Jobs).filter((Jobs.id == job_id), (Jobs.user == current_user)).first()
-            user = dbs.query(User).filter(User.email == form.email.data).first()
-            if not user:
-                return render_template('addjob.html', message='Неверно указана почта', form=form)
-            if job:
-                job.job = form.name.data
-                job.team_leader = current_user.id
-                job.description = form.about.data
-                job.collaborators = ','.join(form.collaborators.data)
-                job.is_finished = job_status_transcriber.index(form.is_finished.data)
-                job.start_date = form.start_date.data
-                job.end_date = form.end_date.data
-                job.work_size = form.work_size.data
-                hl = IntensityLevel()
-                hl.level = form.intensity_level.data
-                job.intensity_level = []
-                job.intensity_level.append(hl)
-                dbs.commit()
-                return redirect(f'/alljobs/{room_id}')
-            else:
-                pass
-        return render_template('addjob.html', form=form)
+                    pass
+            if form.validate_on_submit():
+                dbs = db_session.create_session()
+                job = dbs.query(Jobs).filter((Jobs.id == job_id), (Jobs.user == current_user)).first()
+                user = dbs.query(User).filter(User.email == form.email.data).first()
+                if not user:
+                    return render_template('addjob.html', message='Неверно указана почта', form=form)
+                if job:
+                    job.job = form.name.data
+                    job.team_leader = current_user.id
+                    job.description = form.about.data
+                    job.collaborators = ','.join(form.collaborators.data)
+                    job.is_finished = job_status_transcriber.index(form.is_finished.data)
+                    job.start_date = form.start_date.data
+                    job.end_date = form.end_date.data
+                    job.work_size = form.work_size.data
+                    hl = IntensityLevel()
+                    hl.level = form.intensity_level.data
+                    job.intensity_level = []
+                    job.intensity_level.append(hl)
+                    dbs.commit()
+                    return redirect(f'/alljobs/{room_id}')
+                else:
+                    pass
+            return render_template('addjob.html', form=form)
+        return render_template('not_allowed.html', room_id=room_id, f_pr=False)
     return render_template('not_allowed.html', room_id=room_id, f_pr=False)
 
 
@@ -374,6 +500,14 @@ def edit_job(room_id, job_id):
 def delete_job(room_id, job_id):
     dbs = db_session.create_session()
     jobs = dbs.query(Jobs).filter((Jobs.id == job_id), (Jobs.user == current_user)).first()
+    rooms = dbs.query(Rooms).filter((Rooms.id == room_id)).first()
+    if rooms and current_user.id == rooms.team_leader:
+        if rooms.tasks:
+            tasks = rooms.tasks.split(', ')
+            print(tasks, job_id)
+            tasks.remove(str(job_id))
+            rooms.tasks = ', '.join(tasks)
+        dbs.commit()
     if jobs and current_user.id == jobs.team_leader:
         dbs.delete(jobs)
         dbs.commit()
@@ -393,9 +527,23 @@ def all_rooms():
         for el in res:
             title = el.title
             team_leader = el.team_leader
+            x = []
             collaborators = el.collaborators
+            if collaborators is not None:
+                for elem in collaborators:
+                    elem = dbs.query(User).filter(User.id == elem).first()
+                    if elem is not None:
+                        x.append(elem.email)
+            collaborators = ', '.join(x)
             about = el.about
             tasks = el.tasks
+            x = []
+            if tasks is not None:
+                for elem in tasks:
+                    elem = dbs.query(Jobs).filter(Jobs.id == elem).first()
+                    if elem is not None:
+                        x.append(elem.job)
+            tasks = ', '.join(x)
             rooms.append([title, about, team_leader, tasks, collaborators, el.id])
         return render_template('allrooms.html', rooms=rooms)
     else:
@@ -422,8 +570,16 @@ def add_room():
         room.title = form.title.data
         room.about = form.about.data
         room.team_leader = current_user.id
-        room.collaborators = ','.join(form.collaborators.data)
-        room.tasks = ', '.join(form.tasks.data)
+        x = []
+        for el in form.collaborators.data:
+            el = dbs.query(Jobs).filter(Jobs.job == el).first().id
+            x.append(str(el))
+        room.collaborators = ', '.join(x)
+        x = []
+        for el in form.tasks.data:
+            el = dbs.query(Jobs).filter(Jobs.job == el).first().id
+            x.append(str(el))
+        room.tasks = ', '.join(x)
         db_sess.add(room)
         db_sess.commit()
         return redirect(f"/alljobs/{room.id}")
@@ -436,43 +592,53 @@ def edit_room(id):
     form = RoomForm()
     dbs = db_session.create_session()
     users = dbs.query(User).all()
-    dbs.commit()
-    tasks = dbs.query(Jobs).all()
-    form.team_leader.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
-    for el in users:
-        form.collaborators.choices.append(str(el.email))
-    for el in tasks:
-        form.tasks.choices.append(str(el.job))
-    if request.method == "GET":
-        dbs = db_session.create_session()
-        room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()
-        if room:
-            room.title = form.title.data
-            room.about = form.about.data
-            room.team_leader = current_user.id
-            if form.collaborators.data is not None:
-                room.collaborators = ','.join(form.collaborators.data)
-            if form.tasks.data is not None:
-                room.tasks = ', '.join(form.tasks.data)
-        else:
-            pass
-    if form.validate_on_submit():
-        dbs = db_session.create_session()
-        room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()
-        user = dbs.query(User).filter(User.id == form.team_leader.data).first()
-        if not user:
-            return render_template('addroom.html', message='Неверно указан team_leader', form=form)
-        if room:
-            room.title = form.title.data
-            room.about = form.about.data
-            room.team_leader = current_user.id
-            room.collaborators = ','.join(form.collaborators.data)
-            room.tasks = ', '.join(form.tasks.data)
-            dbs.commit()
-            return redirect('/allrooms')
-        else:
-            pass
-    return render_template('addroom.html', form=form)
+    room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()
+    if room is not None and current_user.id == room.team_leader:
+        tasks = dbs.query(Jobs).all()
+        form.team_leader.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
+        for el in users:
+            form.collaborators.choices.append(str(el.email))
+        for el in tasks:
+            form.tasks.choices.append(str(el.job))
+        if request.method == "GET":
+            dbs = db_session.create_session()
+            room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()
+            if room:
+                form.title.data = room.title
+                form.about.data = room.about
+                room.team_leader = current_user.id
+                if form.collaborators.data is not None:
+                    form.collaborators.data = room.collaborators
+                if form.tasks.data is not None:
+                    form.tasks.data = room.tasks
+            else:
+                pass
+        if form.validate_on_submit():
+            dbs = db_session.create_session()
+            room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()
+            user = dbs.query(User).filter(User.email == form.team_leader.data).first()
+            if not user:
+                return render_template('addroom.html', message='Неверно указан team_leader', form=form)
+            if room:
+                room.title = form.title.data
+                room.about = form.about.data
+                room.team_leader = current_user.id
+                x = []
+                for el in form.collaborators.data:
+                    el = dbs.query(Jobs).filter(Jobs.job == el).first().id
+                    x.append(str(el))
+                room.collaborators = ', '.join(x)
+                x = []
+                for el in form.tasks.data:
+                    el = dbs.query(Jobs).filter(Jobs.job == el).first().id
+                    x.append(str(el))
+                room.tasks = ', '.join(x)
+                dbs.commit()
+                return redirect('/allrooms')
+            else:
+                pass
+        return render_template('addroom.html', form=form)
+    return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
 
 
 @app.route('/room_delete/<int:id>', methods=['GET', 'POST'])
