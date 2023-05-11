@@ -50,9 +50,9 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.hazard_level.label }}<br>
-            {{ form.hazard_level(class="form-control") }}<br>
-            {% for error in form.hazard_level.errors %}
+            {{ form.intensity_level.label }}<br>
+            {{ form.intensity_level(class="form-control") }}<br>
+            {% for error in form.intensity_level.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
