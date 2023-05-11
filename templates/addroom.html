@@ -2,10 +2,12 @@
 
 {% block content %}
 <h2 id="temp">{{ title }}</h2>
-    <form action="" method="post">
+<div class="buttons">
+    <a href="/allrooms" class="btn btn-secondary"><- Назад</a></div>
+    <br><form action="" method="post">
         {{ form.hidden_tag() }}
         <div class="forms">
-            {{ form.title.label }}<br>
+            <font size="4">{{ form.title.label }}</font><br>
             {{ form.title(class="form-control") }}<br>
             {% for error in form.title.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -14,7 +16,7 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.team_leader.label }}<br>
+            <font size="4">{{ form.team_leader.label }}</font><br>
             {{ form.team_leader(class="form-control") }}<br>
             {% for error in form.team_leader.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -23,7 +25,7 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.about.label }}<br>
+            <font size="4">{{ form.about.label }}</font><br>
             {{ form.about(class="form-control") }}<br>
             {% for error in form.about.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -32,9 +34,18 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.tasks.label }}<br>
+            <font size="4">{{ form.tasks.label }}</font><br>
             {{ form.tasks(class="form-control") }}<br>
             {% for error in form.tasks.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.collaborators.label }}</font><br>
+            {{ form.collaborators(class="form-control") }}<br>
+            {% for error in form.collaborators.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>

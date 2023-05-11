@@ -1,13 +1,14 @@
 {% extends "base.html" %}
+style{
 
+}
 {% block content %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/style.css') }}" />
-<form action="" method="post">
-    <h2>Авторизация</h2>
-    <img src="/static/covers/avt1.png" width="10%">
+    <br><form action="" method="post">
+        <h2>Авторизация</h2>
         {{ form.hidden_tag() }}
         <div>
-            {{ form.email.label }}<br>
+            <font size="4">{{ form.email.label }}</font><br>
             {{ form.email(class="form-control", type="email") }}<br>
             {% for error in form.email.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -16,7 +17,7 @@
             {% endfor %}
         </div>
         <div>
-            {{ form.password.label }}<br>
+            <font size="4">{{ form.password.label }}</font><br>
             {{ form.password(class="form-control", type="password") }}<br>
             {% for error in form.password.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -24,8 +25,8 @@
                 </div>
             {% endfor %}
         </div>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div><font size="4">{{ form.remember_me() }} {{ form.remember_me.label }}</font></div><br>
+        <p>{{ form.submit(type="submit", class="btn btn-success") }}</p>
         <div>{{ message }}</div>
     </form>
 {% endblock %}

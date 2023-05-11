@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="work_logs">
+    <h1>Упс! Кажется, вам сюда нельзя. У вас недостаточно прав. </h1>
+    <div class="buttons">
+        <a href="/alljobs/{{ room_id }}" class="btn btn-warning">{{ "Перейти в личную комнату" if f_pr else "Назад, в прошлую
+            комнату" }}</a>
+        <a href="/allrooms" class="btn btn-success">Вернуться и осмотреть все комнаты</a>
+    </div>
+</div>
+{% endblock %}

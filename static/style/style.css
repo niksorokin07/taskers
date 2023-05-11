@@ -1,15 +1,38 @@
+body {
+    background-color: #D0FFB7;
+}
 form {
    display: block;
-   margin-left: 300px;
-   margin-right: 300px;
-   border: 2px solid black;
-   border-radius: 10px;
-   background: #AFEEEE;
+   width: 500px;
+   margin-left: auto;
+   margin-right: auto;
+   border-radius: 15px;
+   background: #97D178;
    padding-left: 50px;
    padding-right: 50px;
    padding-top: 20px;
    padding-bottom: 20px;
+   margin: 10px auto;
+   padding: 1em;
+   box-shadow:
+   0 1px 4px rgba(0, 0, 0, .3),
+   -23px 0 20px -23px rgba(0, 0, 0, .8),
+   23px 0 20px -23px rgba(0, 0, 0, .8),
+   0 0 40px rgba(0, 0, 0, .1) inset;
 }
+form1 {
+    border: 2px solid black;
+    border-radius: 10px;
+    display: grid;
+    margin-left: auto;
+    margin-right: auto;
+    width: 1000px;
+}
+#titles{
+    border-bottom: 2px solid black;
+    background-color: #97D178;
+}
+
 img {
     margin-left: 10px;
 }
@@ -43,12 +66,10 @@ h2, div, .buttons, table {
     font-family: cursive;
     display: block;
 }
-h2 {
-    margin-left: 150px;
+h1, h2, aside {
+    text-align: center;
 }
-h1 {
-    margin-left: 430px;
-}
+
 h3 {
     margin-left: 300px;
 }
@@ -90,9 +111,7 @@ h4 {
     display: flex;
 }
 #room_list {
-    max-width: 200px;
-    margin-left: 5%;
-    margin-right: 3%;
+    width: 300px;
 }
 #main_table {
     border-collapse: separate;
@@ -122,3 +141,17 @@ h4 {
 	width: 250px;
 	word-wrap: break-word;
 }
+.name_btn {
+  text-decoration: none;
+  display: inline-block;
+  color: black;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background-color: #97D178;
+  background-size: 200% auto;
+  transition: .3s;
+}
+
+
