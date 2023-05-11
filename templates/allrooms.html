@@ -1,39 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 id="spec2">Rooms log</h2>
+<style>
+    .table {
+text-align: left;
+width  = 600px;
+border-spacing: 5px;
+background: #AFEEEE;
+
+border: 16px solid #ECE9E0;
+border-radius: 20px;
+}
+
+
+</style>
+<h2 id="spec2">Список комнат</h2>
 <div id="work_logs">
-{% if current_user.is_authenticated %}
-    <a href="addroom" class="btn btn-secondary">Добавить комнату</a>
+    {% if current_user.is_authenticated %}
+    <a href="/addroom" class="btn btn-secondary">Добавить комнату</a>
     <br/>
-{% endif %}
-{% for room in rooms %}
-    <h5>Комната № #{{ rooms[5] }}</h5>
+    {% endif %}
+    {% for room in rooms %}
+    <h5>Комната № {{ room[5] }}</h5>
     <div class="buttons">
-        <a href="/room/{{ room[4] }}" class="btn btn-danger">Перейти</a>
+        <a href="/alljobs/{{ room[5] }}" class="btn btn-warning">Перейти</a>
+        <a href="/addroom/{{ room[5] }}" class="btn btn-danger">Изменить</a>
+        <a href="/room_delete/{{ room[5] }}" class="btn btn-danger">Удалить</a>
     </div>
     <br/>
     <table class="table">
-      <thead class="thead-light">
-        <tr class="d-flex" style="background-color: #e1e1e1">
-          <th scope="col" class="col-4">Название</th>
-          <th scope="col" class="col-4">Описание</th>
-          <th scope="col" class="col-2">Тим Лид</th>
-          <th scope="col" class="col-2">Список соучастников</th>
-          
-          
+        <thead class="thead-light">
+        <tr>
+            <th scope="col" class="col-2">Название</th>
+            <th scope="col" class="col-2">Описание</th>
+            <th scope="col" class="col-2">Тим Лид</th>
+            <th scope="col" class="col-2">Задачи (id)</th>
+            <th scope="col" class="col-2">Список соучастников</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr class="d-flex" style="background-color: #8affff">
-          <td class="col-4">{{ room[0] }}</td>
-          <td class="col-4">{{ room[1] }}</td>
-          <td class="col-2">{{ room[2] }}</td>
-          <td class="col-4">{{ room[3] }}</td>
-        
+        </thead>
+        <tbody>
+        <tr>
+            <td class="col-2">{{ room[0] }}</td>
+            <td class="col-2">{{ room[1] }}</td>
+            <td class="col-2">{{ room[2] }}</td>
+            <td class="col-2">{{ room[3] }}</td>
+            <td class="col-2">{{ room[4] }}</td>
         </tr>
-      </tbody>
+        </tbody>
     </table>
-{% endfor %}
+    {% endfor %}
 </div>
 {% endblock %}

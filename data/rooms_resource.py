@@ -1,12 +1,12 @@
 from flask_restful import reqparse, abort, Api, Resource
 from flask import Flask, request, jsonify
-from .rooms import Room
+from .rooms import Rooms
 from data import db_session
 
 
 def abort_if_rooms_not_found(rooms_id):
     session = db_session.create_session()
-    news = session.query(Room).get(rooms_id)
+    news = session.query(Rooms).get(rooms_id)
     if not news:
         abort(404, message=f"Room {rooms_id} not found")
 
@@ -22,7 +22,7 @@ class RoomsResource(Resource):
         rooms_id = int(rooms_id)
         abort_if_rooms_not_found(rooms_id)
         session = db_session.create_session()
-        news = session.query(Room).get(rooms_id)
+        news = session.query(Rooms).get(rooms_id)
         return jsonify({'Rooms': news.to_dict(
             only=('id', 'title', 'about', 'team_leader', 'tasks', 'collaborators'))})
 
@@ -31,7 +31,7 @@ class RoomsResource(Resource):
         rooms_id = int(rooms_id)
         abort_if_rooms_not_found(rooms_id)
         session = db_session.create_session()
-        news = session.query(Room).get(rooms_id)
+        news = session.query(Rooms).get(rooms_id)
         session.delete(news)
         session.commit()
         return jsonify({'success': 'OK'})
@@ -40,7 +40,7 @@ class RoomsResource(Resource):
 class RoomsListResource(Resource):
     def get(self):
         session = db_session.create_session()
-        news = session.query(Room).all()
+        news = session.query(Rooms).all()
         return jsonify({'Rooms': [item.to_dict(
             only=('id', 'title', 'about', 'team_leader', 'tasks', 'collaborators'))
             for item in news]})
@@ -55,7 +55,7 @@ class RoomsListResource(Resource):
         args = parser.parse_args()
         session = db_session.create_session()
         if args["title"] and args["about"] and args["team_leader"] and args["tasks"] and args["collaborators"]:
-            rooms = Room()
+            rooms = Rooms()
             rooms.team_leader = args["team_leader"]
             rooms.title = args["title"]
             rooms.about = args["about"]

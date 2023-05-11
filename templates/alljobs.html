@@ -1,41 +1,133 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 id="spec2">Works log</h2>
+<style>
+    #job_teamlead{
+    border: 1px;
+
+    background-color: #AFEEEE;
+    border:
+
+
+    }
+    #roomss{
+
+        text-decoration: none;
+      display: inline-block;
+      color: black;
+      padding: 20px 30px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background-color: #AFEEEE;
+      background-size: 200% auto;
+      transition: .3s;
+    }
+     #roomss:hover{
+     letter-spacing: 3px;
+    #search_query {
+      display: inline-block;
+  }
+  form {
+      text-align: center;
+      background-color: #3c1e00;
+      padding: 20px;
+      border-radius: 5px;
+      color: white;
+    }
+    input[type="text"] {
+      width: 70%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+    }
+    button[type="submit"] {
+      width: 20%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button[type="reset"] {
+      width: 20%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button[type="submit"]:hover {
+      background-color: #45a049;
+    }
+     }
+</style>
+
+<h2 id="spec2">Комната номер {{ crId }} для пользователя {{ crU }}</h2>
+<div id="parent1">
+<div id="room_list">
+{% for room in rooms %}
+    <ol>
+        <a href="/alljobs/{{ room[1] }}">
+            <li id = 'roomss'>{{ room[0] }}</li>
+        </a>
+    </ol>
+{% endfor %}
+<a href="/allrooms" class="btn btn-secondary">Посмотреть все комнаты</a>
+</div>
 <div id="work_logs">
 {% if current_user.is_authenticated %}
-    <a href="addjob" class="btn btn-secondary">Добавить работу</a>
+    <a href="/addjob/{{ crId }}" class="btn btn-secondary">Добавить работу</a>
     <br/>
 {% endif %}
-{% for job in jobs %}
-    <h5>Задача № #{{ job[6] }}</h5>
-    <div class="buttons">
-        <a href="/addjob/{{ job[6] }}" class="btn btn-danger">Изменить</a>
-        <a href="/job_delete/{{ job[6] }}" class="btn btn-danger">Удалить</a>
-    </div>
-    <br/>
-    <table class="table">
-      <thead class="thead-light">
-        <tr class="d-flex" style="background-color: #e1e1e1">
-          <th scope="col" class="col-4">Название</th>
-          <th scope="col" class="col-2">Тим Лид</th>
-          <th scope="col" class="col-2">Продолжительность</th>
-          <th scope="col" class="col-2">Список соучастников</th>
-          <th scope="col" class="col-1">Уровенб опасности</th>
-          <th scope="col" class="col-1">Закончена ли?</th>
+<div id="search_query">
+    <form action="/search/{{ crId }}" method="POST">
+        <input type="text" name="query" placeholder="{{ label }}">
+        <button type="submit" class="btn btn-success">Поиск</button>
+        <a href="/alljobs/{{ crId }}" class="btn btn-danger">Отмена</a>
+    </form>
+</div>
+{% for data in ans %}
+    <table id="main_table">
+        <tr id="job_name">
+            {% for row in data %}
+            <td>
+                <h5>Задача №{{ row[2] }}</h5>
+                <div class="buttons">
+                    <a href="/addjob/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Изменить</a>
+                    <a href="/job_delete/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Удалить</a>
+                </div>
+            </td>
+            {% endfor %}
         </tr>
-      </thead>
-      <tbody>
-        <tr class="d-flex" style="background-color: #8affff">
-          <td class="col-4">{{ job[0] }}</td>
-          <td class="col-2">{{ job[1] }}</td>
-          <td class="col-2">{{ job[2] }}</td>
-          <td class="col-2">{{ job[3] }}</td>
-          <td class="col-1">{{ job[7] }}</td>
-          <td class="col-1" style="background-color: #40e0d0">{{ "Работа окончена" if job[4] else "Работа не окончена" }}</td>
+        <tr id="job_cover" style="border-radius: 20px;">
+            {% for row in data %}
+            <td>
+                <a href="/job_description/{{row[2]}}/{{crId}}">
+                    <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img" style="border-radius: 20px;"/>
+                    <div class="CoverText">{{ row[0] }}</div>
+                </a>
+            </td>
+            {% endfor %}
         </tr>
-      </tbody>
+        <tr id="job_teamlead" >
+            {% for row in data %}
+            <td>
+                Тим лид: {{row[1]}}
+            </td>
+            {% endfor %}
+        </tr>
     </table>
 {% endfor %}
 </div>
+</div>
 {% endblock %}
+
+
+

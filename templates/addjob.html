@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2 id="temp">{{ title }}</h2>
+<a href="/alljobs/{{ room_id }}" class="btn btn-secondary">Back</a>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <div class="forms">
@@ -17,6 +18,15 @@
             {{ form.name.label }}<br>
             {{ form.name(class="form-control") }}<br>
             {% for error in form.name.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            {{ form.about.label }}<br>
+            {{ form.about(class="form-control") }}<br>
+            {% for error in form.about.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
@@ -41,9 +51,9 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.hazard_level.label }}<br>
-            {{ form.hazard_level(class="form-control") }}<br>
-            {% for error in form.hazard_level.errors %}
+            {{ form.intensity_level.label }}<br>
+            {{ form.intensity_level(class="form-control") }}<br>
+            {% for error in form.intensity_level.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>

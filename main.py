@@ -388,7 +388,7 @@ def addjob(id):
                 db_sess.add(current_room)
                 db_sess.commit()
                 return redirect(f"/alljobs/{id}")
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=id)
         else:
             return render_template('not_allowed.html', room_id=id, f_pr=False)
     else:
@@ -429,7 +429,7 @@ def addjob(id):
                 db_sess.add(current_room)
                 db_sess.commit()
                 return redirect(f"/alljobs/{id}")
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=id)
         else:
             return render_template('not_allowed.html', room_id=id, f_pr=False)
 
@@ -490,7 +490,7 @@ def edit_job(room_id, job_id):
                     return redirect(f'/alljobs/{room_id}')
                 else:
                     pass
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=room_id)
         return render_template('not_allowed.html', room_id=room_id, f_pr=False)
     return render_template('not_allowed.html', room_id=room_id, f_pr=False)
 
