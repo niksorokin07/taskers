@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <style>
+      #okno {
+        width: 600px;
+        height: 50px;
+        text-align: center;
+        padding: 15px;
+        border: 3px solid #0000cc;
+        border-radius: 10px;
+        background: #db7093;
+        color: #0000cc;
+        display: none;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+      }
+      #okno:target {display: block;}
+      .close {
+        display: inline-block;
+        border: 1px solid #0000cc;
+        color: #0000cc;
+        padding: 0 12px;
+        margin: 10px;
+        text-decoration: none;
+        background: #db7093;
+        font-size: 14pt;
+        cursor:pointer;
+      }
+    </style>
+<h5>Задача № #{{ job[6] }}</h5>
+<h4>Описание: {{ job[8] }} </h4>
+    <div class="buttons">
+        <a href="/addjob/{{ crId }}/{{ job[6] }}" class="btn btn-warning">Изменить</a>
+        <a href="#okno" class="btn btn-warning">Удалить</a>
+    </div>
+    <div id="okno">Вы уверены, что хотите уалить задачу?<br>
+        <a href="/job_delete/{{ crId }}/{{ job[6] }}" class="btn btn-danger">Удалить</a>
+    </div>
+
+    <br/>
+    <table class="table">
+      <thead class="thead-light">
+        <tr class="d-flex" style="background-color: #e1e1e1">
+          <th scope="col" class="col-3">Название</th>
+          <th scope="col" class="col-2">Тим Лид</th>
+          <th scope="col" class="col-2">Продолжительность</th>
+          <th scope="col" class="col-1">Дедлайн</th>
+          <th scope="col" class="col-2">Список соучастников</th>
+          <th scope="col" class="col-1">Уровень опасности</th>
+          <th scope="col" class="col-1">Закончена ли?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="d-flex" style="background-color: #8affff">
+          <td class="col-3">{{ job[0] }}</td>
+          <td class="col-2">{{ job[1] }}</td>
+          <td class="col-2">{{ job[2] }}</td>
+          <td class="col-1">{{ job[9] }}</td>
+          <td class="col-2">{{ job[3] }}</td>
+          <td class="col-1">{{ job[7] }}</td>
+          <td class="col-1" style="background-color: #40e0d0">{{ "Работа окончена" if job[4] else "Работа не окончена" }}</td>
+        </tr>
+      </tbody>
+    </table>
+{% endblock %}
