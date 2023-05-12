@@ -15,9 +15,11 @@ border-radius: 20px;
 
 
 </style>
-<h2 id="spec2">Список задач</h2>
+<br><h2 id="spec2">Список задач</h2><br>
+<a href="/addjob/{{ room_id }}" class="name_btn">Добавить задачу в личную комнату</a><br><br>
+<a class="name_btn" href="/alljobs/{{current_user.current_room}}">Перейти в личную комнату</a>
 <div id="work_logs">
-    <a href="/addjob/{{ room_id }}" class="btn btn-secondary">Добавить задачу в личную комнату</a>
+
     <br/>
     {% for task in tasks %}
     <h5>Задача № {{ task[5] }}</h5>

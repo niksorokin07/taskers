@@ -3,7 +3,7 @@ body {
 }
 form {
    display: block;
-   width: 500px;
+   width: 1300px;
    margin-left: auto;
    margin-right: auto;
    border-radius: 15px;
@@ -20,7 +20,7 @@ form {
    23px 0 20px -23px rgba(0, 0, 0, .8),
    0 0 40px rgba(0, 0, 0, .1) inset;
 }
-form1 {
+#form1 {
     border: 2px solid black;
     border-radius: 10px;
     display: grid;
@@ -145,6 +145,20 @@ h4 {
   text-decoration: none;
   display: inline-block;
   color: black;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background-color: #97D178;
+  background-size: 200% auto;
+  transition: .3s;
+}
+.name_btn2 {
+  text-decoration: none;
+  display: inline-block;
+  color: black;
+  margin-left: auto;
+  margin-right: auto;
   padding: 20px 30px;
   border-radius: 10px;
   text-transform: uppercase;

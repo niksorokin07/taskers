@@ -24,26 +24,16 @@
       transition: .3s;
     }
      #roomss:hover{
-     letter-spacing: 3px;
-    #search_query {
-      display: inline-block;
-  }
-  form {
-      text-align: center;
-      background-color: #3c1e00;
-      padding: 20px;
-      border-radius: 5px;
-      color: white;
-    }
-    input[type="text"] {
-      width: 70%;
+     letter-spacing: 3px;}
+input[type="text"] {
+      width: 750px;
       padding: 12px 20px;
       margin: 8px 0;
       box-sizing: border-box;
       border: 2px solid #ccc;
       border-radius: 4px;
     }
-    button[type="submit"] {
+button[type="submit"] {
       width: 20%;
       background-color: #4CAF50;
       color: white;
@@ -53,9 +43,9 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button[type="reset"] {
+#reset-btn {
       width: 20%;
-      background-color: #4CAF50;
+      background-color: red;
       color: white;
       padding: 14px 20px;
       margin: 8px 0;
@@ -63,8 +53,8 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    button[type="submit"]:hover {
-      width: 300px;
+button[type="submit"]:hover {
+      width: 20%;
       background-color: #45a049;
     }
      }
@@ -73,35 +63,23 @@
         border-bottom: 2px solid black;
     }
 
+
+
 </style>
-<br><h2 id="spec2">Комната номер {{ crId }} для пользователя {{ crU }}</h2><br>
-<form1 action="/search/{{ crId }}" method="POST">
-    <br>
-    <div id="work_logs">
-        <div id="search_query">
-            {% if current_user.is_authenticated %}
-            <a href="/addjob/{{ crId }}" class="btn btn-secondary">Добавить работу</a>
-            {% endif %}
-            <input type="text" name="query" placeholder="{{ label }}">
-            <button type="submit" class="btn btn-success">Поиск</button>
-            <a href="/alljobs/{{ crId }}" class="btn btn-danger">Отмена</a>
-        </div>
-    </div>
-    <br></form1><br>
-<div id="parent1">
-    <div id="room_list">
-        <br><a href="/allrooms" class="btn btn-secondary">Посмотреть все комнаты</a>
-        <br>
-        <br><a href="/alltasks" class="btn btn-secondary">Посмотреть все доступные задачи</a>
-        {% for room in rooms %}
-        <ol>
-            <br><a href="/alljobs/{{ room[1] }}">
-            <li id='roomss'>{{ room[0] }}</li>
-        </a>
-        </ol>
-        {% endfor %}
-    </div>
-</div>
+<br><h2 id="spec2">Комната "{{ crR }}" для пользователя {{ crU }}</h2><br>
+{% if current_user.is_authenticated %}
+<a href="/addjob/{{ crId }}" class="name_btn2">Добавить работу</a>
+{% endif %}
+<br>
+<br><a href="/allrooms" class="name_btn2">Посмотреть все комнаты</a>
+<br>
+<br><a href="/alltasks" class="name_btn2">Посмотреть все доступные задачи</a>
+<form action="/search/{{ crId }}" method="POST">
+    <input type="text" name="query" placeholder="{{ label }}">
+    <button type="submit" class="btn btn-success">Поиск</button>
+    <a href="/alljobs/{{ crId }}" id="reset-btn" class="btn btn-danger">Отмена</a>
+</form>
+<br><br>
 <div id='notifications'>
     {% for n in notes1 %}
     <div class="alert">
@@ -110,38 +88,49 @@
     </div>
     {%endfor%}
 </div>
-{% for data in ans %}
-<table id="main_table">
-    <tr id="job_name">
-        {% for row in data %}
-        <td>
-            <h5>Задача №{{ row[2] }}</h5>
-            <div class="buttons">
-                <a href="/addjob/{{ crId }}/{{ row[2] }}" class="btn btn-warning">Изменить</a>
-                <a href="/job_delete/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Удалить</a>
-            </div>
-        </td>
+<div id="parent1">
+    <div id="room_list">
+        {% for room in rooms %}
+        <ol>
+            <br><a href="/alljobs/{{ room[1] }}">
+            <li id='roomss'>{{ room[0] }}</li>
+        </a>
+        </ol>
         {% endfor %}
-    </tr>
-    <tr id="job_cover" style="border-radius: 20px;">
-        {% for row in data %}
-        <td>
-            <a href="/job_description/{{row[2]}}/{{crId}}">
-                <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img"
-                     style="border-radius: 20px;"/>
-                <div class="CoverText">{{ row[0] }}</div>
-            </a>
-        </td>
-        {% endfor %}
-    </tr>
-    <tr id="job_teamlead">
-        {% for row in data %}
-        <td>
-            Тим лид: {{row[1]}}
-        </td>
-        {% endfor %}
-    </tr>
-</table>
+    </div>
+    {% for data in ans %}
+    <table id="main_table">
+        <tr id="job_name">
+            {% for row in data %}
+            <td>
+                <h5>Задача №{{ row[2] }}</h5>
+                <div class="buttons">
+                    <a href="/addjob/{{ crId }}/{{ row[2] }}" class="btn btn-warning">Изменить</a>
+                    <a href="/job_delete/{{ crId }}/{{ row[2] }}" class="btn btn-danger">Удалить</a>
+                </div>
+            </td>
+            {% endfor %}
+        </tr>
+        <tr id="job_cover" style="border-radius: 20px;">
+            {% for row in data %}
+            <td>
+                <a href="/job_description/{{row[2]}}/{{crId}}">
+                    <img src="{{ url_for('static', filename='covers/' + row[3]) }}" id="job_img"
+                         style="border-radius: 20px;"/>
+                    <div class="CoverText">{{ row[0] }}</div>
+                </a>
+            </td>
+            {% endfor %}
+        </tr>
+        <tr id="job_teamlead">
+            {% for row in data %}
+            <td>
+                Тим лид: {{row[1]}}
+            </td>
+            {% endfor %}
+        </tr>
+    </table>
+</div>
 {% endfor %}
 {% endblock %}
 
