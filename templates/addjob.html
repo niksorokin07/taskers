@@ -2,10 +2,12 @@
 
 {% block content %}
 <h2 id="temp">{{ title }}</h2>
-    <form action="" method="post">
+<div class="buttons">
+    <a href="/alljobs/{{ room_id }}" class="btn btn-secondary"><- Назад</a></div>
+    <br><form action="" method="post">
         {{ form.hidden_tag() }}
         <div class="forms">
-            {{ form.email.label }}<br>
+            <font size="4">{{ form.email.label }}</font><br>
             {{ form.email(class="form-control", type="email") }}<br>
             {% for error in form.email.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -14,7 +16,7 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.name.label }}<br>
+            <font size="4">{{ form.name.label }}</font><br>
             {{ form.name(class="form-control") }}<br>
             {% for error in form.name.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -23,7 +25,16 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.work_size.label }}<br>
+            <font size="4">{{ form.about.label }}</font><br>
+            {{ form.about(class="form-control") }}<br>
+            {% for error in form.about.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.work_size.label }}</font><br>
             {{ form.work_size(class="form-control") }}<br>
             {% for error in form.work_size.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -32,7 +43,7 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.collaborators.label }}<br>
+            <font size="4">{{ form.collaborators.label }}</font><br>
             {{ form.collaborators(class="form-control") }}<br>
             {% for error in form.collaborators.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -41,16 +52,16 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.hazard_level.label }}<br>
-            {{ form.hazard_level(class="form-control") }}<br>
-            {% for error in form.hazard_level.errors %}
+            <font size="4">{{ form.intensity_level.label }}</font><br>
+            {{ form.intensity_level(class="form-control") }}<br>
+            {% for error in form.intensity_level.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.start_date.label }}<br>
+            <font size="4">{{ form.start_date.label }}</font><br>
             {{ form.start_date(class="form-control") }}<br>
             {% for error in form.start_date.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -59,7 +70,7 @@
             {% endfor %}
         </div>
         <div class="forms">
-            {{ form.end_date.label }}<br>
+            <font size="4">{{ form.end_date.label }}</font><br>
             {{ form.end_date(class="form-control") }}<br>
             {% for error in form.end_date.errors %}
                 <div class="alert alert-danger" role="alert">
@@ -67,8 +78,8 @@
                 </div>
             {% endfor %}
         </div>
-        <p class="forms">{{ form.is_finished() }} {{ form.is_finished.label }}</p>
-        <p class="forms">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div class="forms"><font size="4">{{ form.is_finished.label }} {{ form.is_finished() }}</font></div><br>
+        <p class="forms">{{ form.submit(type="submit", class="btn btn-success") }}</p>
         <div>{{ message }}</div>
     </form>
 {% endblock %}

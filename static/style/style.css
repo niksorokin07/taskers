@@ -1,6 +1,40 @@
+body {
+    background-color: #D0FFB7;
+}
 form {
-   margin-left: 40px;
-   margin-right: 800px;
+   display: block;
+   width: 500px;
+   margin-left: auto;
+   margin-right: auto;
+   border-radius: 15px;
+   background: #97D178;
+   padding-left: 50px;
+   padding-right: 50px;
+   padding-top: 20px;
+   padding-bottom: 20px;
+   margin: 10px auto;
+   padding: 1em;
+   box-shadow:
+   0 1px 4px rgba(0, 0, 0, .3),
+   -23px 0 20px -23px rgba(0, 0, 0, .8),
+   23px 0 20px -23px rgba(0, 0, 0, .8),
+   0 0 40px rgba(0, 0, 0, .1) inset;
+}
+form1 {
+    border: 2px solid black;
+    border-radius: 10px;
+    display: grid;
+    margin-left: auto;
+    margin-right: auto;
+    width: 1000px;
+}
+#titles{
+    border-bottom: 2px solid black;
+    background-color: #97D178;
+}
+
+img {
+    margin-left: 10px;
 }
 #login_h1 {
    color: #333333;
@@ -14,6 +48,11 @@ form {
     border: 2px solid black;
     border-radius: 10px;
 }
+b {
+    margin-left: 230px;
+    margin-right: auto;
+}
+
 #news{
     max-width: 60%;
     margin-left: 2%;
@@ -23,19 +62,96 @@ form {
     color: rgb(100, 100, 180);
     display:inline-block;
 }
-h2, .buttons, table {
-    margin-left: 2%;
-    margin-right: 2%;
+h2, div, .buttons, table {
+    font-family: cursive;
+    display: block;
+}
+h1, h2, aside {
+    text-align: center;
+}
+
+h3 {
+    margin-left: 300px;
+}
+h4 {
+    margin-left: 15px;
 }
 .forms{
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 10px;
 }
-#tablea{
-position: relative;top: 400px; left: 400px;
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  margin-bottom: 15px;
+}
 
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
 }
-#tableb{
-margin-left:50%;
 
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
 }
+
+#work_logs {
+  padding-left: 300px;
+}
+/* alljobs */
+#parent1 {
+    display: flex;
+}
+#room_list {
+    width: 300px;
+}
+#main_table {
+    border-collapse: separate;
+	border-spacing: 20px;
+    margin-left: 3%;
+    margin-right: 3%;
+    max-width: 70%;
+}
+#job_name {
+	text-align: center;
+	font-weight: bold;
+	width: 250px;
+	word-wrap: break-word;
+}
+#job_cover {
+	text-align: center;
+	width: 250px;
+	word-wrap: break-word;
+}
+#job_img {
+	height: 200px;
+	width: 200px;
+}
+#job_teamlead{
+	text-align: center;
+	font-weight: bold;
+	width: 250px;
+	word-wrap: break-word;
+}
+.name_btn {
+  text-decoration: none;
+  display: inline-block;
+  color: black;
+  padding: 20px 30px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background-color: #97D178;
+  background-size: 200% auto;
+  transition: .3s;
+}
+
+

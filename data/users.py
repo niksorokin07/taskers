@@ -17,6 +17,7 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String, nullable=True, unique=True, index=True)
     password_hash = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    current_room = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey('rooms.id'), nullable=True)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

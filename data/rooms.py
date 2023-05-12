@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from data.db_session import SqlAlchemyBase
 
 
-class Room(SqlAlchemyBase, UserMixin):
+class Rooms(SqlAlchemyBase, UserMixin):
     __tablename__ = "rooms"
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)

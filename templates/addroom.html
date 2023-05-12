@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 id="temp">{{ title }}</h2>
+<div class="buttons">
+    <a href="/allrooms" class="btn btn-secondary"><- Назад</a></div>
+    <br><form action="" method="post">
+        {{ form.hidden_tag() }}
+        <div class="forms">
+            <font size="4">{{ form.title.label }}</font><br>
+            {{ form.title(class="form-control") }}<br>
+            {% for error in form.title.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.team_leader.label }}</font><br>
+            {{ form.team_leader(class="form-control") }}<br>
+            {% for error in form.team_leader.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.about.label }}</font><br>
+            {{ form.about(class="form-control") }}<br>
+            {% for error in form.about.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.tasks.label }}</font><br>
+            {{ form.tasks(class="form-control") }}<br>
+            {% for error in form.tasks.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="forms">
+            <font size="4">{{ form.collaborators.label }}</font><br>
+            {{ form.collaborators(class="form-control") }}<br>
+            {% for error in form.collaborators.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+        <p class="forms">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <div>{{ message }}</div>
+    </form>
+{% endblock %}
