@@ -1,6 +1,6 @@
 import sqlite3
 
-
+print('1'.split(","))
 class Room:
     def __init__(self, key, managers, users, tasks):
         self.key = key

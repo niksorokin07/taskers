@@ -14,6 +14,7 @@ from data.rooms import Rooms
 from data.notifications import Notifications
 from data.intensity_levels import IntensityLevel
 from data import db_session, users_resource, rooms_resource, jobs_resource
+from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 api = Api(app)
@@ -41,47 +42,105 @@ def search_results(query):
 
 
 class LoginForm(FlaskForm):
-    email = EmailField('Почта', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    email = EmailField('Почта:', validators=[DataRequired()])
+    password = PasswordField('Пароль:', validators=[DataRequired()])
     remember_me = BooleanField('Запомнить меня')
     submit = SubmitField('Войти')
 
 
 class RegisterForm(FlaskForm):
-    email = EmailField('Login / email', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password_again = PasswordField('Repeat password', validators=[DataRequired()])
-    surname = StringField('Surname', validators=[DataRequired()])
-    name = StringField('Name', validators=[DataRequired()])
-    age = IntegerField('Age')
-    position = StringField('Position')
-    speciality = StringField('Speciality')
-    address = StringField("Address")
-    submit = SubmitField('Register')
+    email = EmailField('Почта:', validators=[DataRequired()])
+    password = PasswordField('Пароль:', validators=[DataRequired()])
+    password_again = PasswordField('Повторите пароль:', validators=[DataRequired()])
+    surname = StringField('Фамилия:', validators=[DataRequired()])
+    name = StringField('Имя:', validators=[DataRequired()])
+    age = IntegerField('Возраст:')
+    position = StringField('Позиция:')
+    speciality = StringField('Специальность:')
+    address = StringField("Адрес:")
+    submit = SubmitField('Зарегистрироваться')
 
 
 class JobForm(FlaskForm):
-    email = SelectField('Team leader email', choices=[], validators=[DataRequired()])
-    name = StringField('Title of job', validators=[DataRequired()])
-    about = StringField('Description of job', validators=[DataRequired()])
-    work_size = IntegerField('Work size', validators=[DataRequired()])
-    collaborators = SelectMultipleField('Collaborators', choices=[])
-    start_date = DateTimeField('Start date', format='%Y-%m-%d %H:%M:%S',
+    email = SelectField('Почта тимлида:', choices=[], validators=[DataRequired()])
+    name = StringField('Название работы:', validators=[DataRequired()])
+    about = StringField('Описание работы:', validators=[DataRequired()])
+    work_size = IntegerField('Объем работы:', validators=[DataRequired()])
+    collaborators = SelectMultipleField('Соучастники:', choices=[])
+    start_date = DateTimeField('Дата начала:', format='%Y-%m-%d %H:%M:%S',
                                default=datetime.datetime(year=2023, month=1, day=1, hour=1, minute=1, second=1))
-    end_date = DateTimeField('End date', format='%Y-%m-%d %H:%M:%S',
+    end_date = DateTimeField('Дата окончания:', format='%Y-%m-%d %H:%M:%S',
                              default=datetime.datetime(year=2023, month=1, day=1, hour=1, minute=1, second=1))
-    intensity_level = SelectField('Intensity level', choices=[], default=0)
-    is_finished = SelectField('Job status', choices=job_status_transcriber, default=0)
-    submit = SubmitField('Submit')
+    intensity_level = SelectField('Уровень сложности:', choices=[], default=0)
+    is_finished = SelectField('Статус работы:', choices=job_status_transcriber, default=0)
+    submit = SubmitField('Сохранить')
 
 
 class RoomForm(FlaskForm):
-    title = StringField('Title of job', validators=[DataRequired()])
-    about = StringField('About the job', validators=[DataRequired()])
-    team_leader = SelectField('Team leader id', choices=[], validators=[DataRequired()])
-    tasks = SelectMultipleField('Select tasks', choices=[])
-    collaborators = SelectMultipleField('Collaborators', choices=[])
-    submit = SubmitField('Submit')
+    title = StringField('Название комнаты:', validators=[DataRequired()])
+    about = StringField('Описание комнаты:', validators=[DataRequired()])
+    team_leader = SelectField('ID тимлида:', choices=[], validators=[DataRequired()])
+    tasks = SelectMultipleField('Выберите задачи:', choices=[])
+    collaborators = SelectMultipleField('Соучастники:', choices=[])
+    submit = SubmitField('Сохранить')
+
+
+class ChangeForm(FlaskForm):
+    email = EmailField('Почта:', validators=[DataRequired()])
+    old_password = PasswordField('Старый пароль', validators=[DataRequired()])
+    new_password = PasswordField('Новый пароль', validators=[DataRequired()])
+    password_again = PasswordField('Повторите новый пароль', validators=[DataRequired()])
+    surname = StringField('Фамилия:', validators=[DataRequired()])
+    name = StringField('Имя:', validators=[DataRequired()])
+    age = IntegerField('Возраст:')
+    position = StringField('Позиция:')
+    speciality = StringField('Специальность:')
+    address = StringField("Адрес:")
+    submit = SubmitField('Изменить')
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    return render_template('profile.html', current_user=current_user, title='Profile form')
+
+
+@app.route('/changeprofile', methods=['GET', 'POST'])
+def changeprofile():
+    form = ChangeForm()
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    form.name.data = user.name
+    form.email.data = user.email
+    form.surname.data = user.surname
+    form.age.data = user.age
+    form.position.data = user.position
+    form.address.data = user.address
+    form.speciality.data = user.speciality
+    if form.validate_on_submit():
+        if not user.check_password(form.old_password.data):
+            return render_template('changeprofile.html', title='Change form',
+                                   form=form,
+                                   message="Неверный старый пароль!")
+        if form.new_password.data != form.password_again.data:
+            return render_template('changeprofile.html', title='Change form',
+                                   form=form,
+                                   message="Новые пароли не совпадают")
+        if not db_sess.query(User).filter(User.email == form.email.data).first():
+            return render_template('changeprofile.html', title='Change form',
+                                   form=form,
+                                   message="Вы пытаетесь стать новым пользователем")
+        else:
+            user.name = form.name.data
+            user.email = form.email.data
+            user.surname = form.surname.data
+            user.age = form.age.data
+            user.position = form.position.data
+            user.address = form.address.data
+            user.speciality = form.speciality.data
+            user.set_password(form.new_password.data)
+            db_sess.commit()
+        return redirect(f'/login')
+    return render_template('changeprofile.html', title='Register form', form=form)
 
 
 @login_manager.user_loader
@@ -93,7 +152,7 @@ def load_user(user_id):
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("handle_authentification.html")
+    return redirect("/login")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,15 +167,6 @@ def login():
         else:
             return render_template('login.html', message="Неправильный логин или пароль!", form=form)
     return render_template('login.html', title='Авторизация', form=form)
-
-
-@login_required
-@app.route('/profile')
-def profile():
-    user = current_user
-    name = user.name + " " + user.surname
-    email = user.email
-    return render_template('profile.html', name=name, email=email, pos=user.position, sp=user.speciality)
 
 
 @app.route('/logout')
@@ -156,7 +206,12 @@ def register():
         personal_room.title = f"Personal room for {tl.email}"
         personal_room.about = "personal room"
         personal_room.team_leader = tl.id
+        note = Notifications()
+        note.text = f'Добро пожаловать! Вы можете редактировать и удалять только те задачи, в которых являетесь Владельцем!'
+        note.users = str(tl.email)
+        note.mister = True
         db_sess.add(personal_room)
+        db_sess.add(note)
         db_sess.commit()
         tl.current_room = db_sess.query(Rooms).filter(
             db_sess.query(User).filter(User.email == form.email.data).first().id == Rooms.team_leader).first().id
@@ -172,20 +227,14 @@ def all_jobs(id):
     db_sess = db_session.create_session()
     data = []
     ct = 0
-    print(current_user)
     current_room = db_sess.query(Rooms).filter(Rooms.id == id).first()
     if current_room is not None:
-        print(1)
         if current_room.collaborators:
-            print(2)
             if current_user.id in [current_room.team_leader] + current_room.collaborators.split(","):
-                print(3)
                 if current_room.tasks is not None:
                     x = current_room.tasks.split(", ")
-                    print(4)
                 else:
                     x = None
-                    print(5)
                 if x and not (len(x) == 1 and not x[0]):
                     available_tasks = tuple(map(int, x))
                 else:
@@ -212,9 +261,7 @@ def all_jobs(id):
                     rooms.append((f"{el.title} |{el.team_leader}", el.id))
                 notes1 = []
                 for i in dbs.query(Notifications).all():
-                    a = ""
                     a = i.users.split(',')
-                    # print(a)
                     if current_user.email in a and i.mister == True:
                         notes1.append((i.text))
                         i.mister = False
@@ -239,7 +286,7 @@ def all_jobs(id):
                 for el in db_sess.query(Jobs):
                     if el.id in available_tasks:
                         team_leader = f"{el.user.name} {el.user.surname}"
-                        cover = str(random.randint(1, 21)) + ".png"
+                        cover = str(random.randint(1, 20)) + ".png"
                         data.append((el.job, team_leader, el.id, cover))
                 ans = []
                 i = 0
@@ -260,7 +307,6 @@ def all_jobs(id):
                 for i in dbs.query(Notifications).all():
                     a = ""
                     a = i.users.split(',')
-                    # print(a)
                     if current_user.email in a and i.mister == True:
                         notes1.append((i.text))
                         i.mister = False
@@ -294,8 +340,9 @@ def search(id):
                     if el[0] in available_tasks:
                         user = dbs.query(User).filter(User.id == el[1]).first()
                         team_leader = f"{user.name} {user.surname}"
-                        cover = str(random.randint(1, 21)) + ".png"
+                        cover = str(random.randint(1, 20)) + ".png"
                         jobs.append((el[2], team_leader, el[0], cover))
+                print(cover)
                 ans = []
                 i = 0
                 while i < len(jobs):
@@ -331,7 +378,7 @@ def search(id):
                     if el[0] in available_tasks:
                         user = dbs.query(User).filter(User.id == el[1]).first()
                         team_leader = f"{user.name} {user.surname}"
-                        cover = str(random.randint(1, 21)) + ".png"
+                        cover = str(random.randint(1, 20)) + ".png"
                         jobs.append((el[2], team_leader, el[0], cover))
                 ans = []
                 i = 0
@@ -371,7 +418,7 @@ def job_descr(id, room_id):
         isf = job_status_transcriber[int(el.is_finished)]
         lvl = el.intensity_level[-1].level
         job = [title, team_leader, time, collaborators, isf, el.user.id, el.id, lvl, el.description, el.end_date]
-        return render_template("job_description.html", crId=current_room.id, job=job)
+        return render_template("job_description.html", crId=current_room.id, job=job, room_id=room_id)
     else:
         return render_template('not_allowed.html', room_id=current_user.current_room, f_pr=True)
 
@@ -384,7 +431,6 @@ def addjob(id):
     room = dbs.query(Rooms).filter(Rooms.id == id).first()
     if room.collaborators is not None:
         if current_user.id in [room.team_leader] + room.collaborators.split(","):
-
             res = dbs.query(User).all()
             dbs.commit()
             form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
@@ -434,7 +480,7 @@ def addjob(id):
                 db_sess.add(current_room)
                 db_sess.commit()
                 return redirect(f"/alljobs/{id}")
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=id)
         else:
             return render_template('not_allowed.html', room_id=id, f_pr=False)
     else:
@@ -475,7 +521,7 @@ def addjob(id):
                 db_sess.add(current_room)
                 db_sess.commit()
                 return redirect(f"/alljobs/{id}")
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=id)
         else:
             return render_template('not_allowed.html', room_id=id, f_pr=False)
 
@@ -536,7 +582,7 @@ def edit_job(room_id, job_id):
                     return redirect(f'/alljobs/{room_id}')
                 else:
                     pass
-            return render_template('addjob.html', form=form)
+            return render_template('addjob.html', form=form, room_id=room_id)
         return render_template('not_allowed.html', room_id=room_id, f_pr=False)
     return render_template('not_allowed.html', room_id=room_id, f_pr=False)
 

@@ -1,25 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<style>
-    .name_btn {
-  text-decoration: none;
-  display: inline-block;
-  color: black;
-  padding: 20px 30px;
-  border-radius: 10px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background-color: #AFEEEE;
-  background-size: 200% auto;
-  transition: .3s;
-}
-#titles{
-border: 1px solid black;
-
-background-color: #AFEEEE;
-
-}
-</style>
 <head>
 
 
@@ -36,16 +16,10 @@ background-color: #AFEEEE;
         <br>
         <nav><a>
             {% if current_user.is_authenticated %}
-                <a class="name_btn" href="/logout">выйти из аккаунта({{ current_user.name }})</a>
-                <div class="alert">
-                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                Вы можете редактировать и удалять только те задачи, в которых являетесь Владельцем!</div>
-            {% else %}
-                <a>
-                    <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
-                    <a class="btn btn-success" href="/login">Войти</a>
-                </a>
+                <aside><a class="name_btn" href="/logout">выйти из аккаунта({{ current_user.email }})</a></aside>
+
             {% endif %}
+            <a class="name_btn" href="/profile">Профиль</a>
         </a></nav>
          {% block content %}
          {% endblock content %}
