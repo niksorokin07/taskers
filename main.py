@@ -244,6 +244,7 @@ def all_jobs(id):
                         team_leader = f"{el.user.name} {el.user.surname}"
                         cover = str(random.randint(1, 21)) + ".png"
                         data.append((el.job, team_leader, el.id, cover))
+                        print(cover)
                 ans = []
                 i = 0
                 while i < len(data):
@@ -288,6 +289,7 @@ def all_jobs(id):
                         team_leader = f"{el.user.name} {el.user.surname}"
                         cover = str(random.randint(1, 20)) + ".png"
                         data.append((el.job, team_leader, el.id, cover))
+                        print(cover)
                 ans = []
                 i = 0
                 while i < len(data):
@@ -430,7 +432,8 @@ def addjob(id):
     dbs = db_session.create_session()
     room = dbs.query(Rooms).filter(Rooms.id == id).first()
     if room.collaborators is not None:
-        if current_user.id in [room.team_leader] + room.collaborators.split(","):
+        if current_user.id in [room.team_leader] + room.collaborators.split(
+                ",") and current_user.id != room.team_leader or current_user.id in room.collaborators.split(","):
             res = dbs.query(User).all()
             dbs.commit()
             form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
@@ -484,7 +487,7 @@ def addjob(id):
         else:
             return render_template('not_allowed.html', room_id=id, f_pr=False)
     else:
-        if current_user.id in [room.team_leader]:
+        if current_user.id in [room.team_leader] and current_user.id != room.team_leader:
             res = dbs.query(User).all()
             dbs.commit()
             form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
@@ -532,7 +535,8 @@ def edit_job(room_id, job_id):
     form = JobForm()
     dbs = db_session.create_session()
     task = dbs.query(Jobs).filter(Jobs.id == job_id).first()
-    if current_user.id in [task.team_leader] + task.collaborators.split(","):
+    if current_user.id in [task.team_leader] + task.collaborators.split(
+            ",") and current_user.id != task.team_leader or current_user.id in task.collaborators.split(","):
         if current_user.id == task.team_leader:
             res = dbs.query(User).all()
             form.email.choices.append(dbs.query(User).filter(User.id == current_user.id).first().email)
@@ -608,6 +612,39 @@ def delete_job(room_id, job_id):
     return redirect(f'/alljobs/{room_id}')
 
 
+@app.route('/alltasks')
+@login_required
+def all_tasks():
+    dbs = db_session.create_session()
+    if current_user.is_authenticated:
+        res = dbs.query(Jobs).filter(
+            (Jobs.team_leader.like(current_user.id) | Jobs.collaborators.like(f'%{current_user.id}%')))
+        tasks = []
+        rooms = dbs.query(Rooms).filter(Rooms.team_leader.like(current_user.id) | Rooms.collaborators.like(f'%{current_user.id}%')).all()
+        for el in res:
+            team_leader = el.team_leader
+            x = []
+            collaborators = el.collaborators
+            if collaborators is not None:
+                for elem in collaborators:
+                    elem = dbs.query(User).filter(User.id == elem).first()
+                    if elem is not None:
+                        x.append(elem.email)
+            collaborators = ', '.join(x)
+            date_s = el.start_date
+            is_f = el.is_finished
+            d = el.description
+            rooms_of_a_job = []
+            for r in rooms:
+                available_tasks = list(map(int, r.tasks.split(", ")))
+                if available_tasks is not None and el.id in available_tasks:
+                    rooms_of_a_job.append(r.title)
+            tasks.append([team_leader, d, date_s, collaborators, is_f, el.id, ', '.join(rooms_of_a_job)])
+        return render_template('alltasks.html', tasks=tasks, room_id=current_user.current_room)
+    else:
+        pass
+
+
 @app.route('/allrooms')
 @login_required
 def all_rooms():
@@ -637,6 +674,7 @@ def all_rooms():
                         x.append(elem.job)
             tasks = ', '.join(x)
             rooms.append([title, about, team_leader, tasks, collaborators, el.id])
+
         return render_template('allrooms.html', rooms=rooms)
     else:
         pass
