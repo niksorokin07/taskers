@@ -16,8 +16,8 @@
         <br>
         <nav><a>
             {% if current_user.is_authenticated %}
-                <aside><a class="name_btn" href="/logout">выйти из аккаунта({{ current_user.email }})</a></aside>
-                <a class="name_btn" href="/profile">Профиль</a>
+                <aside><a class="name_btn" href="/logout">выйти из аккаунта({{ current_user.email }})</a>
+                <a class="name_btn" href="/profile">Профиль</a></aside>
             {% endif %}
 
         </a></nav>

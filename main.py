@@ -142,7 +142,7 @@ def changeprofile():
             user.position = form.position.data
             user.address = form.address.data
             user.speciality = form.speciality.data
-            if form.new_password.data and form.new_password.data != form.password_again.data:
+            if form.new_password.data and form.new_password.data == form.password_again.data:
                 user.set_password(form.new_password.data)
             db_sess.add(user)
             print(form.surname.data)
@@ -165,16 +165,19 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
-            return redirect(f"/alljobs/{user.current_room}")
-        else:
-            return render_template('login.html', message="Неправильный логин или пароль!", form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+    if not current_user.is_authenticated:
+        form = LoginForm()
+        if form.validate_on_submit():
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).filter(User.email == form.email.data).first()
+            if user and user.check_password(form.password.data):
+                login_user(user, remember=form.remember_me.data)
+                return redirect(f"/alljobs/{user.current_room}")
+            else:
+                return render_template('login.html', message="Неправильный логин или пароль!", form=form)
+        return render_template('login.html', title='Авторизация', form=form)
+    else:
+        return redirect(f"/alljobs/{current_user.current_room}")
 
 
 @app.route('/logout')
@@ -186,48 +189,50 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegisterForm()
-    if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Register form',
-                                   form=form,
-                                   message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('register.html', title='Register form',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            surname=form.surname.data,
-            age=form.age.data,
-            position=form.position.data,
-            address=form.address.data,
-            speciality=form.speciality.data)
-        user.set_password(form.password.data)
-        db_sess.add(user)
+    if not current_user.is_authenticated:
+        form = RegisterForm()
+        if form.validate_on_submit():
+            if form.password.data != form.password_again.data:
+                return render_template('register.html', title='Register form',
+                                       form=form,
+                                       message="Пароли не совпадают")
+            db_sess = db_session.create_session()
+            if db_sess.query(User).filter(User.email == form.email.data).first():
+                return render_template('register.html', title='Register form',
+                                       form=form,
+                                       message="Такой пользователь уже есть")
+            user = User(
+                name=form.name.data,
+                email=form.email.data,
+                surname=form.surname.data,
+                age=form.age.data,
+                position=form.position.data,
+                address=form.address.data,
+                speciality=form.speciality.data)
+            user.set_password(form.password.data)
+            db_sess.add(user)
 
-        db_sess.commit()
-        personal_room = Rooms()
-        tl = db_sess.query(User).filter(User.email == form.email.data).first()
-        personal_room.title = f"Personal room for {tl.email}"
-        personal_room.about = "personal room"
-        personal_room.team_leader = tl.id
-        note = Notifications()
-        note.text = f'Добро пожаловать! Вы можете редактировать и удалять только те задачи, в которых являетесь Владельцем!'
-        note.users = str(tl.email)
-        note.mister = True
-        db_sess.add(personal_room)
-        db_sess.add(note)
-        db_sess.commit()
-        tl.current_room = db_sess.query(Rooms).filter(
-            db_sess.query(User).filter(User.email == form.email.data).first().id == Rooms.team_leader).first().id
-        db_sess.add(user)
-        db_sess.commit()
-        return redirect(f'/login')
-    return render_template('register.html', title='Register form', form=form)
-
+            db_sess.commit()
+            personal_room = Rooms()
+            tl = db_sess.query(User).filter(User.email == form.email.data).first()
+            personal_room.title = f"Personal room for {tl.email}"
+            personal_room.about = "personal room"
+            personal_room.team_leader = tl.id
+            note = Notifications()
+            note.text = f'Добро пожаловать! Вы можете редактировать и удалять только те задачи, в которых являетесь Владельцем!'
+            note.users = str(tl.email)
+            note.mister = True
+            db_sess.add(personal_room)
+            db_sess.add(note)
+            db_sess.commit()
+            tl.current_room = db_sess.query(Rooms).filter(
+                db_sess.query(User).filter(User.email == form.email.data).first().id == Rooms.team_leader).first().id
+            db_sess.add(user)
+            db_sess.commit()
+            return redirect(f'/login')
+        return render_template('register.html', title='Register form', form=form)
+    else:
+        return redirect(f"/alljobs/{current_user.current_room}")
 
 @app.route('/alljobs/<int:id>')
 @login_required
@@ -248,7 +253,7 @@ def all_jobs(id):
                 else:
                     available_tasks = ()
                 for el in db_sess.query(Jobs):
-                    if el.id in available_tasks:
+                    if el.id in available_tasks and el.collaborators.split(',') and str(current_user.id) in el.collaborators.split(',') + [str(el.team_leader)]:
                         team_leader = f"{el.user.name} {el.user.surname}"
                         cover = str(random.randint(1, 20)) + ".png"
                         data.append((el.job, team_leader, el.id, cover))
@@ -269,13 +274,14 @@ def all_jobs(id):
                     rooms.append((f"{el.title} |{el.team_leader}", el.id))
                 notes1 = []
                 for i in dbs.query(Notifications).all():
-                    a = i.users.split(',')
-                    if current_user.email in a:
-                        notes1.append((i.text))
-                        a.remove(current_user.email)
-                        i.users = ','.join(a)
-                        if not a:
-                            dbs.delete(i)
+                    if i.users:
+                        a = i.users.split(',')
+                        if current_user.email in a:
+                            notes1.append((i.text))
+                            a.remove(current_user.email)
+                            i.users = ','.join(a)
+                    else:
+                        dbs.delete(i)
                 print(notes1)
                 dbs.commit()
                 return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
@@ -315,14 +321,15 @@ def all_jobs(id):
                     rooms.append((f"{el.title} |{el.team_leader}", el.id))
                 notes1 = []
                 for i in dbs.query(Notifications).all():
-                    a = i.users.split(',')
-                    if current_user.email in a:
-                        notes1.append((i.text))
-                        a.remove(current_user.email)
-                        i.users = ','.join(a)
-                        if not a:
-                            dbs.delete(i)
-                dbs.commit()
+                    if i.users:
+                        a = i.users.split(',')
+                        if current_user.email in a:
+                            notes1.append((i.text))
+                            a.remove(current_user.email)
+                            i.users = ','.join(a)
+                    else:
+                        dbs.delete(i)
+                    dbs.commit()
                 return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
                                        crId=current_room.id, crU=current_user.email, notes1=notes1,
                                        crR=current_room.title)
@@ -422,7 +429,8 @@ def job_descr(id, room_id):
     task = dbs.query(Jobs).filter(Jobs.id == id).first()
     team_lead = dbs.query(User).filter(User.id == task.team_leader).first().email
     current_room = dbs.query(Rooms).filter(Rooms.id == room_id).first()
-    if str(current_user.email) in [team_lead] + task.collaborators.split(","):
+    team_leadr = dbs.query(User).filter(User.id == current_room.team_leader).first().email
+    if str(current_user.email) in [team_lead] + [team_leadr] + task.collaborators.split(","):
         el = dbs.query(Jobs).filter(Jobs.id == id).first()
         title = el.job
         time = el.end_date - el.start_date
@@ -482,12 +490,15 @@ def addjob(id):
                 note.text = f'Вам поступило новое задание: {form.name.data}'
                 note.users = ','.join(form.collaborators.data)
                 note.mister = True
-                available_tasks = list(map(int, current_room.tasks.split(", ")))
+                if current_room.tasks:
+                    available_tasks = list(map(int, current_room.tasks.split(", ")))
+                else:
+                    available_tasks = None
                 if available_tasks is not None:
                     available_tasks.append(job.id)
                     current_room.tasks = ', '.join(map(lambda x: str(x), available_tasks))
                 else:
-                    current_room.tasks = str(job.id) + ', '
+                    current_room.tasks = str(job.id)
                 db_sess.add(note)
                 db_sess.add(current_room)
                 db_sess.commit()
@@ -622,6 +633,7 @@ def delete_job(room_id, job_id):
                 rooms.tasks = ', '.join(tasks)
             dbs.commit()
         note = Notifications()
+        print(1)
         note.text = f'Задача {jobs.job} была удалена'
         note.users = rooms.collaborators
         note.mister = True
@@ -657,6 +669,7 @@ def all_tasks():
             is_f = el.is_finished
             d = el.description
             rooms_of_a_job = []
+            count = 0
             for r in rooms:
                 q = r.tasks.split(", ")
                 if q != ['']:
@@ -664,9 +677,13 @@ def all_tasks():
                 else:
                     available_tasks = None
                 if available_tasks is not None and el.id in available_tasks:
+                    if count == 0:
+                        delete_task = r.id
+                        count = 1
                     rooms_of_a_job.append(r.title)
             tasks.append([team_leader, d, date_s, collaborators, is_f, el.id, ', '.join(rooms_of_a_job)])
-        return render_template('alltasks.html', current_user=current_user, tasks=tasks,
+
+        return render_template('alltasks.html', current_user=current_user, tasks=tasks, delete_task=delete_task,
                                room_id=current_user.current_room)
     else:
         pass
@@ -721,7 +738,8 @@ def add_room():
         if el.id != current_user.id:
             form.collaborators.choices.append(str(el.email))
     for el in tasks:
-        form.tasks.choices.append(str(el.job))
+        if str(current_user.id) in [str(el.team_leader)] + el.collaborators.split(","):
+            form.tasks.choices.append(str(el.job))
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         room = Rooms()
@@ -758,7 +776,8 @@ def edit_room(id):
             if el.id != current_user.id:
                 form.collaborators.choices.append(str(el.email))
         for el in tasks:
-            form.tasks.choices.append(str(el.job))
+            if str(current_user.id) in [str(el.team_leader)] + el.collaborators.split(","):
+                form.tasks.choices.append(str(el.job))
         if request.method == "GET":
             dbs = db_session.create_session()
             room = dbs.query(Rooms).filter((Rooms.id == id), (Rooms.team_leader == current_user.id)).first()

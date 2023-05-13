@@ -1,20 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<style>
-    .table {
-text-align: left;
-width  = 600px;
-border-spacing: 5px;
-background: #AFEEEE;
 
-border: 16px solid #ECE9E0;
-border-radius: 20px;
-}
-
-
-
-</style>
 <br><h2 id="spec2">Список задач</h2><br>
 <a href="/addjob/{{ room_id }}" class="name_btn">Добавить задачу в личную комнату</a><br><br>
 <a class="name_btn" href="/alljobs/{{current_user.current_room}}">Перейти в личную комнату</a>
@@ -24,30 +11,30 @@ border-radius: 20px;
     {% for task in tasks %}
     <h5>Задача № {{ task[5] }}</h5>
     <div class="buttons">
-        <a href="/job_description/{{ task[5] }}/1" class="btn btn-warning">Перейти</a>
-        <a href="/addroom/{{ task[5] }}" class="btn btn-danger">Изменить</a>
-        <a href="/room_delete/{{ task[5] }}" class="btn btn-danger">Удалить</a>
+        <a href="/job_description/{{ task[5] }}/{{ room_id }}" class="btn btn-warning">Перейти</a>
+        <a href="/addjob/{{ room_id }}/{{ task[5] }}" class="btn btn-danger">Изменить</a>
+        <a href="/job_delete/{{ delete_task }}/{{ task[5] }}" class="btn btn-danger">Удалить</a>
     </div>
     <br/>
     <table class="table">
         <thead class="thead-light">
-        <tr>
-            <th scope="col" class="col-2">Тим Лид</th>
-            <th scope="col" class="col-2">Описание</th>
-            <th scope="col" class="col-2">Дата Начала</th>
-            <th scope="col" class="col-2">Список соучастников</th>
-            <th scope="col" class="col-2">Статус</th>
-            <th scope="col" class="col-4">Комнаты с этой задачей</th>
+        <tr class="d-flex">
+            <th scope="col" class="col-2" style="background-color: #97D178">Тим Лид</th>
+            <th scope="col" class="col-2" style="background-color: #97D178">Описание</th>
+            <th scope="col" class="col-2" style="background-color: #97D178">Дата Начала</th>
+            <th scope="col" class="col-2" style="background-color: #97D178">Список соучастников</th>
+            <th scope="col" class="col-2" style="background-color: #97D178">Статус</th>
+            <th scope="col" class="col-4" style="background-color: #97D178">Комнаты с этой задачей</th>
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td class="col-2">{{ task[0] }}</td>
-            <td class="col-2">{{ task[1] }}</td>
-            <td class="col-2">{{ task[2] }}</td>
-            <td class="col-2">{{ task[3] }}</td>
-            <td class="col-2">{{ task[4] }}</td>
-            <td class="col-4">{{ task[6] }}</td>
+        <tr class="d-flex">
+            <td class="col-2" style="background-color: white">{{ task[0] }}</td>
+            <td class="col-2" style="background-color: white">{{ task[1] }}</td>
+            <td class="col-2" style="background-color: white">{{ task[2] }}</td>
+            <td class="col-2" style="background-color: white">{{ task[3] }}</td>
+            <td class="col-2" style="background-color: white">{{ task[4] }}</td>
+            <td class="col-4" style="background-color: white">{{ task[6] }}</td>
         </tr>
         </tbody>
     </table>
