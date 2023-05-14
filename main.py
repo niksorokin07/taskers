@@ -81,7 +81,7 @@ class JobForm(FlaskForm):
 class RoomForm(FlaskForm):
     title = StringField('Название комнаты:', validators=[DataRequired()])
     about = StringField('Описание комнаты:', validators=[DataRequired()])
-    team_leader = SelectField('ID тимлида:', choices=[], validators=[DataRequired()])
+    team_leader = SelectField('Почта тимлида:', choices=[], validators=[DataRequired()])
     tasks = SelectMultipleField('Выберите задачи:', choices=[])
     collaborators = SelectMultipleField('Соучастники:', choices=[])
     submit = SubmitField('Сохранить')
@@ -662,8 +662,8 @@ def all_tasks():
             x = []
             collaborators = el.collaborators
             if collaborators is not None:
-                for elem in collaborators:
-                    elem = dbs.query(User).filter(User.id == elem).first()
+                for elem in collaborators.split(','):
+                    elem = dbs.query(User).filter(User.email == elem).first()
                     if elem is not None:
                         x.append(elem.email)
             collaborators = ', '.join(x)
@@ -702,6 +702,7 @@ def all_rooms():
         for el in res:
             title = el.title
             team_leader = el.team_leader
+            team_leader = dbs.query(User).filter(User.id == team_leader).first().email
             x = []
             collaborators = el.collaborators
             if collaborators is not None:
