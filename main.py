@@ -234,6 +234,7 @@ def register():
     else:
         return redirect(f"/alljobs/{current_user.current_room}")
 
+
 @app.route('/alljobs/<int:id>')
 @login_required
 def all_jobs(id):
@@ -253,7 +254,9 @@ def all_jobs(id):
                 else:
                     available_tasks = ()
                 for el in db_sess.query(Jobs):
-                    if el.id in available_tasks and el.collaborators.split(',') and str(current_user.id) in el.collaborators.split(',') + [str(el.team_leader)]:
+                    if el.id in available_tasks and el.collaborators.split(',') and \
+                            (str(current_user.email) in el.collaborators.split(',')
+                             or str(current_user.id) in [str(el.team_leader)]):
                         team_leader = f"{el.user.name} {el.user.surname}"
                         cover = str(random.randint(1, 20)) + ".png"
                         data.append((el.job, team_leader, el.id, cover))
@@ -282,7 +285,6 @@ def all_jobs(id):
                             i.users = ','.join(a)
                     else:
                         dbs.delete(i)
-                print(notes1)
                 dbs.commit()
                 return render_template('alljobs.html', label="Поиск задач по названию", ans=ans, rooms=rooms,
                                        crId=current_room.id, crU=current_user.email, notes1=notes1,
